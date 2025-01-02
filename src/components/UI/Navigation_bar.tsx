@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
           >
             <div className="flex items-center space-x-2">
               <img
-              src="./public/assets/Gicon.png"
+              src="../public/assets/Gicon.png"
               alt="GMTStudio Logo"
               className="h-12 w-12 rounded-full"
               />
