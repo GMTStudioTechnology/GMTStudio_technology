@@ -49,7 +49,24 @@ function MainPage() {
     "Initializing security system...",
   ];
 
-  // Modified typeOutput function
+  const vigenereDecrypt = (ciphertext: string, key: string): string => {
+    let result = '';
+    const normalizedKey = key.toUpperCase().replace(/[^A-Z]/g, '');
+    const normalizedCiphertext = ciphertext.toUpperCase().replace(/[^A-Z]/g, '');
+    
+    if (normalizedKey.length === 0) return '';
+    
+    for (let i = 0; i < normalizedCiphertext.length; i++) {
+      const cipherChar = normalizedCiphertext.charCodeAt(i);
+      const keyChar = normalizedKey.charCodeAt(i % normalizedKey.length);
+      const shift = keyChar - 65;
+      const decryptedChar = ((cipherChar - 65 - shift + 26) % 26) + 65;
+      result += String.fromCharCode(decryptedChar);
+    }
+    
+    return result;
+  };
+
   const typeOutput = async (message: string) => {
     return new Promise<void>((resolve) => {
       let currentText = '';
@@ -71,14 +88,12 @@ function MainPage() {
     });
   };
 
-  // Scroll terminal to bottom
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [typingOutput]);
 
-  // Countdown timer effect
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
@@ -104,7 +119,6 @@ function MainPage() {
     return () => clearInterval(timer);
   }, [endDate, startDate]);
 
-  // Boot sequence effect
   useEffect(() => {
     if (powerOn && bootPhase < bootMessages.length) {
       const timer = setTimeout(() => {
@@ -114,7 +128,6 @@ function MainPage() {
     }
   }, [powerOn, bootPhase, bootMessages.length]);
 
-  // Power button handler
   const handlePowerButton = () => {
     setPowerOn(!powerOn);
     if (!powerOn) {
@@ -127,7 +140,6 @@ function MainPage() {
     }
   };
 
-  // Login handler
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password === 'GMTStudio_dev_technology') {
@@ -139,7 +151,6 @@ function MainPage() {
     }
   };
 
-  // Modified terminal command handler
   const handleTerminalCommand = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const command = terminalInput.toLowerCase().trim();
@@ -154,7 +165,7 @@ function MainPage() {
 
     if (command === 'help') {
       setTypingOutput(prev => [...prev, '']);
-      await typeOutput('Available commands: help, clear, about, decode_binary <binary>, cd, encode, decode');
+      await typeOutput('Available commands: help, clear, about, decode_binary <binary>, cd, encode, decode, decode_vigenere <ciphertext> <key>');
       return;
     }
 
@@ -191,12 +202,34 @@ function MainPage() {
 
     if (command === "decode") {
       const lines = [
-        'https://www.cs.du.edu/~snarayan/crypt/vigenere.html',
-        'https://cryptii.com/pipes/text-to-binary'
+        'Use command: decode_vigenere <ciphertext> <key>',
+        'Use command: decode_binary <binary>'
       ];
       for (const line of lines) {
         setTypingOutput(prev => [...prev, '']);
         await typeOutput(line);
+      }
+      return;
+    }
+
+    if (command.startsWith('decode_vigenere')) {
+      const args = command.slice('decode_vigenere '.length).split(' ');
+      if (args.length < 2) {
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput('Usage: decode_vigenere <ciphertext> <key>');
+        return;
+      }
+
+      const ciphertext = args[0];
+      const key = args[1];
+
+      try {
+        const decrypted = vigenereDecrypt(ciphertext, key);
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput(`Decrypted message: ${decrypted}`);
+      } catch {
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput('Error: Invalid input format');
       }
       return;
     }
@@ -220,7 +253,6 @@ function MainPage() {
     await typeOutput(`Command not found: ${command}`);
   };
 
-  // Render boot sequence
   const renderBootSequence = () => (
     <div>
       {bootMessages.slice(0, bootPhase + 1).map((msg, i) => (
@@ -229,7 +261,6 @@ function MainPage() {
     </div>
   );
 
-  // Render terminal
   const renderTerminal = () => (
     <div className="h-full flex flex-col">
       <div ref={terminalRef} className="flex-grow overflow-auto mb-4 bg-black bg-opacity-70 p-2 rounded">
@@ -262,7 +293,6 @@ function MainPage() {
     <div className="min-h-screen bg-black flex flex-col">
       <Nav/>
       <div className="flex p-2 gap-4 overflow-hidden flex-grow pt-[50px]">
-        {/* Left side - Computer Terminal */}
         <div className="w-3/5 pt-[50px]">
           <div className="h-full bg-black border border-white rounded-lg shadow-2xl overflow-hidden">
             <div className="relative bg-black p-4 h-full flex flex-col">
@@ -323,7 +353,7 @@ function MainPage() {
                       onClick={() => setTerminalOpen(true)}
                       className="flex items-center space-x-2 bg-green-500 text-black px-6 py-3 rounded-lg text-xl font-bold hover:bg-green-400 transition-colors duration-200 shadow-lg"
                     >
-                      <TerminalIcon size={24} className="mr-2" />
+                      <TerminalIcon size={24} className="mr-2"  />
                       <span>Start Terminal</span>
                     </button>
                   </div>
@@ -343,7 +373,6 @@ function MainPage() {
           </div>
         </div>
 
-        {/* Right side - Progress and Timer */}
         <div className="w-2/5 pt-[50px]">
           <div className="h-full bg-black border border-white rounded-lg shadow-2xl p-6 flex flex-col items-center justify-center">
             <h2 className="text-3xl font-bold text-white mb-8">
