@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { TerminalIcon, MonitorOff, Lock } from 'lucide-react';
 import { Power } from '@gravity-ui/icons';
 import { useNavigate } from 'react-router-dom';
-import Nav from '../UI/Navigation_bar'
+import Nav from '../UI/Navigation_bar';
+
 interface TimeLeft {
   days: number;
   hours: number;
@@ -48,11 +49,11 @@ function MainPage() {
     "Initializing security system...",
   ];
 
-  // Typing effect for terminal output
-  const typeOutput = (message: string) => {
+  // Modified typeOutput function
+  const typeOutput = async (message: string) => {
     return new Promise<void>((resolve) => {
       let currentText = '';
-      const typingSpeed = 10; // Adjust typing speed here
+      const typingSpeed = 10;
 
       const typingInterval = setInterval(() => {
         if (currentText.length < message.length) {
@@ -138,47 +139,85 @@ function MainPage() {
     }
   };
 
-  // Terminal command handler
+  // Modified terminal command handler
   const handleTerminalCommand = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const command = terminalInput.toLowerCase().trim();
 
-    // Add user command to output
     setTypingOutput(prev => [...prev, `> ${command}`]);
     setTerminalInput('');
 
-    let response = '';
-    if (command === 'help') {
-      response = 'Available commands: help, clear, about, decode_binary <binary>, cd';
-    } else if (command === 'clear') {
+    if (command === 'clear') {
       setTypingOutput([]);
       return;
-    } else if (command === 'about') {
-      response = 'GMTOS v1.0 - Developed by GMTStudio © 2025';
-    } else if (command === 'cd hero') {
-      response = 'Navigating to Hero page...';
-      await typeOutput(response);
+    }
+
+    if (command === 'help') {
+      setTypingOutput(prev => [...prev, '']);
+      await typeOutput('Available commands: help, clear, about, decode_binary <binary>, cd, encode, decode');
+      return;
+    }
+
+    if (command === 'about') {
+      setTypingOutput(prev => [...prev, '']);
+      await typeOutput('GMTOS v1.0 - Developed by GMTStudio © 2025');
+      return;
+    }
+
+    if (command === 'cd hero') {
+      setTypingOutput(prev => [...prev, '']);
+      await typeOutput('Navigating to Hero page...');
       navigate('/hero');
       return;
-    } else if (command === 'cd') {
-      response = 'Command not found: cd, please specify a directory';
-    } else if (command.startsWith('decode_binary ')) {
+    }
+
+    if (command === 'cd') {
+      setTypingOutput(prev => [...prev, '']);
+      await typeOutput('Command not found: cd, please specify a directory');
+      return;
+    }
+
+    if (command === "encode") {
+      const lines = [
+        'cd: nqkg',
+        'KEY: 01000111 01001101 01010100 01010011 01110100 01110101 01100100 01101001 01101111'
+      ];
+      for (const line of lines) {
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput(line);
+      }
+      return;
+    }
+
+    if (command === "decode") {
+      const lines = [
+        'https://www.cs.du.edu/~snarayan/crypt/vigenere.html',
+        'https://cryptii.com/pipes/text-to-binary'
+      ];
+      for (const line of lines) {
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput(line);
+      }
+      return;
+    }
+
+    if (command.startsWith('decode_binary ')) {
       const binary = command.replace('decode_binary ', '');
       try {
         const decoded = binary.split(' ')
           .map(byte => String.fromCharCode(parseInt(byte, 2)))
           .join('');
-        response = `Decoded message: ${decoded}`;
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput(`Decoded message: ${decoded}`);
       } catch {
-        response = 'Error: Invalid binary format';
+        setTypingOutput(prev => [...prev, '']);
+        await typeOutput('Error: Invalid binary format');
       }
-    } else {
-      response = `Command not found: ${command}`;
+      return;
     }
 
-    // Type out the response
     setTypingOutput(prev => [...prev, '']);
-    await typeOutput(response);
+    await typeOutput(`Command not found: ${command}`);
   };
 
   // Render boot sequence
@@ -220,13 +259,13 @@ function MainPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
-            <Nav/>
+    <div className="min-h-screen bg-black flex flex-col">
+      <Nav/>
       <div className="flex p-2 gap-4 overflow-hidden flex-grow pt-[50px]">
         {/* Left side - Computer Terminal */}
         <div className="w-3/5 pt-[50px]">
-          <div className="h-full bg-gray-800 rounded-lg shadow-2xl overflow-hidden">
-            <div className="relative bg-gray-700 p-4 h-full flex flex-col">
+          <div className="h-full bg-black border border-white rounded-lg shadow-2xl overflow-hidden">
+            <div className="relative bg-black p-4 h-full flex flex-col">
               <button 
                 onClick={handlePowerButton}
                 className="absolute top-4 right-4 w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center shadow-lg border-2 border-gray-700 hover:border-green-500 transition-colors duration-300 z-20"
@@ -306,7 +345,7 @@ function MainPage() {
 
         {/* Right side - Progress and Timer */}
         <div className="w-2/5 pt-[50px]">
-          <div className="h-full bg-gray-800 rounded-lg shadow-2xl p-6 flex flex-col items-center justify-center">
+          <div className="h-full bg-black border border-white rounded-lg shadow-2xl p-6 flex flex-col items-center justify-center">
             <h2 className="text-3xl font-bold text-white mb-8">
               Website Development Progress
             </h2>
