@@ -1,351 +1,357 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Navbar from '../UI/Navigation_bar';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { TerminalIcon, MonitorOff, Lock } from 'lucide-react';
+import { Power } from '@gravity-ui/icons';
+import { useNavigate } from 'react-router-dom';
+import Nav from '../UI/Navigation_bar'
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  progress: number;
+}
 
-// CSS styles for the typing animation
-const styles = `
-    .typing-indicator {
-        display: inline-block;
-        margin-left: 4px;
-    }
+function MainPage() {
+  const navigate = useNavigate();
 
-    .dot {
-        display: inline-block;
-        animation: wave 1.3s linear infinite;
-        margin-right: 2px;
-    }
+  const startDate = useMemo(() => new Date('2025-01-01T00:00:00'), []);
+  const endDate = useMemo(() => new Date('2025-07-01T00:00:00'), []);
 
-    .dot:nth-child(2) {
-        animation-delay: -1.1s;
-    }
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    progress: 0
+  });
 
-    .dot:nth-child(3) {
-        animation-delay: -0.9s;
-    }
+  const [powerOn, setPowerOn] = useState(false);
+  const [bootPhase, setBootPhase] = useState(0);
+  const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  const [typingOutput, setTypingOutput] = useState<string[]>([]);
+  const [showError, setShowError] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
-    @keyframes wave {
-        0%, 60%, 100% {
-            transform: translateY(0);
-            opacity: 0.5;
+  const binaryCode = "0100011101001101010101000111010001110101011001000110100101101111010111110110010001100101011101100101111101110100011001010110001101101000011011100110111101101100011011110110011101111001";
+
+  const bootMessages = [
+    "GMTOS BIOS v1.0",
+    "Copyright © 2025 GMTStudio",
+    "CPU: GMT-X86 @ 4.77MHz",
+    "Memory Test... OK",
+    "Loading GMTOS...",
+    "GMTOS v1.0",
+    "Initializing security system...",
+  ];
+
+  // Typing effect for terminal output
+  const typeOutput = (message: string) => {
+    return new Promise<void>((resolve) => {
+      let currentText = '';
+      const typingSpeed = 10; // Adjust typing speed here
+
+      const typingInterval = setInterval(() => {
+        if (currentText.length < message.length) {
+          currentText += message[currentText.length];
+          setTypingOutput(prev => {
+            const newOutput = [...prev];
+            newOutput[newOutput.length - 1] = currentText;
+            return newOutput;
+          });
+        } else {
+          clearInterval(typingInterval);
+          resolve();
         }
-        30% {
-            transform: translateY(-4px);
-            opacity: 1;
-        }
-    }
-
-    .chat-bubble {
-        animation: fadeIn 0.3s ease-in;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-
-const MainPage: React.FC = () => {
-    const endDate = useMemo(() => {
-        return new Date('2025-07-01T00:00:00');
-    }, []);
-
-    const [timeLeft, setTimeLeft] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-        progress: 0,
-        currentPhase: 'development'
+      }, typingSpeed);
     });
+  };
 
-    const [chatInput, setChatInput] = useState('');
-    const [chatHistory, setChatHistory] = useState<{ 
-        sender: 'user' | 'bot'; 
-        message: string;
-        isTyping?: boolean;
-        displayedMessage?: string;
-    }[]>([]);
+  // Scroll terminal to bottom
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [typingOutput]);
 
-    const [isAnimating, setIsAnimating] = useState(false);
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const difference = endDate.getTime() - now.getTime();
 
-    const responses: { [key: string]: string } = {
-        'what is the project?': 'The project is to build the GMTStudio official website.',
-        'when is the launch date?': 'The launch date is July 1st, 2025.',
-        'how long until launch?': 'Check the countdown timer!',
-        'what is the current phase?': 'The current phase is development.',
-        'hi': 'Hello!',
-        'hello': 'Hi there!',
-        'how are you?': 'I am just a bot, but I am functioning well!',
-        'what can you do?': 'I can answer simple questions about the project and the countdown.',
-    };
+      if (difference < 0) {
+        clearInterval(timer);
+        return;
+      }
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            const now = new Date();
-            const difference = endDate.getTime() - now.getTime();
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-            if (difference < 0) {
-                setTimeLeft({
-                    days: 0,
-                    hours: 0,
-                    minutes: 0,
-                    seconds: 0,
-                    progress: 100,
-                    currentPhase: 'development'
-                });
-                return;
-            }
+      const totalMilliseconds = endDate.getTime() - startDate.getTime();
+      const elapsedMilliseconds = now.getTime() - startDate.getTime();
+      const progress = Math.round((elapsedMilliseconds / totalMilliseconds) * 100);
 
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      setTimeLeft({ days, hours, minutes, seconds, progress });
+    }, 1000);
 
-            const totalDays = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-            const progress = Math.round(((totalDays - days) / totalDays) * 100);
+    return () => clearInterval(timer);
+  }, [endDate, startDate]);
 
-            setTimeLeft({
-                days,
-                hours,
-                minutes,
-                seconds,
-                progress,
-                currentPhase: 'development'
-            });
-        }, 1000);
+  // Boot sequence effect
+  useEffect(() => {
+    if (powerOn && bootPhase < bootMessages.length) {
+      const timer = setTimeout(() => {
+        setBootPhase(prev => prev + 1);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [powerOn, bootPhase, bootMessages.length]);
 
-        return () => clearInterval(timer);
-    }, [endDate]);
+  // Power button handler
+  const handlePowerButton = () => {
+    setPowerOn(!powerOn);
+    if (!powerOn) {
+      setBootPhase(0);
+      setIsLoggedIn(false);
+      setTerminalOpen(false);
+      setPassword('');
+      setAttempts(0);
+      setTypingOutput([]);
+    }
+  };
 
-    const animateTyping = async (message: string, chatIndex: number) => {
-        setIsAnimating(true);
-        for (let i = 0; i <= message.length; i++) {
-            if (!isAnimating) break;
-            setChatHistory(prev => 
-                prev.map((chat, idx) => 
-                    idx === chatIndex
-                        ? { ...chat, displayedMessage: message.slice(0, i) }
-                        : chat
-                )
-            );
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-        setChatHistory(prev => 
-            prev.map((chat, idx) => 
-                idx === chatIndex
-                    ? { ...chat, isTyping: false, displayedMessage: message }
-                    : chat
-            )
-        );
-        setIsAnimating(false);
-    };
+  // Login handler
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (password === 'GMTStudio_dev_technology') {
+      setIsLoggedIn(true);
+    } else {
+      setAttempts(prev => prev + 1);
+      setShowError(true);
+      setTimeout(() => setShowError(false), 2000);
+    }
+  };
 
-    const handleChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!chatInput.trim()) return;
-    
-        const normalizedInput = chatInput.toLowerCase();
-        const response = responses[normalizedInput] || "I don't understand that question.";
-    
-        const newUserChat: {
-            sender: 'user' | 'bot';
-            message: string;
-            displayedMessage: string;
-        } = {
-            sender: 'user',
-            message: chatInput,
-            displayedMessage: chatInput
-        };
-    
-        const newBotChat: {
-            sender: 'user' | 'bot';
-            message: string;
-            isTyping: boolean;
-            displayedMessage: string;
-        } = {
-            sender: 'bot',
-            message: response,
-            isTyping: true,
-            displayedMessage: ''
-        };
-    
-        setChatHistory(prev => [...prev, newUserChat, newBotChat] as typeof prev);
-    
-        setChatInput('');
-    
-        setTimeout(() => {
-            animateTyping(response, chatHistory.length + 1);
-        }, 500);
-    };
+  // Terminal command handler
+  const handleTerminalCommand = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const command = terminalInput.toLowerCase().trim();
 
-    useEffect(() => {
-        return () => {
-            setIsAnimating(false);
-        };
-    }, []);
+    // Add user command to output
+    setTypingOutput(prev => [...prev, `> ${command}`]);
+    setTerminalInput('');
 
-    return (
-        <div className="min-h-screen flex flex-col">
-            <style>{styles}</style>
-            <Navbar/>
-            <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4">
-                <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-center text-white pt-20 mb-8">
-                    GMTStudio official website is under construction
-                </div>
-                <div className="flex w-full max-w-7xl gap-8">
-                    {/* Left Side - Timer Components */}
-                    <div className="w-1/3 flex flex-col items-center justify-center space-y-8">
-                        <div
-                            className="radial-progress text-primary"
-                            style={{ '--value': timeLeft.progress } as React.CSSProperties}
-                            role="progressbar"
-                        >
-                            {timeLeft.progress}%
-                        </div>
-                        
-                        <div className="grid grid-flow-col gap-2 text-center auto-cols-max">
-                            <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
-                                <span className="font-mono text-4xl">{timeLeft.days}</span>
-                                days
-                            </div>
-                            <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
-                                <span className="font-mono text-4xl">
-                                    {timeLeft.hours.toString().padStart(2, '0')}
-                                </span>
-                                hours
-                            </div>
-                            <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
-                                <span className="font-mono text-4xl">
-                                    {timeLeft.minutes.toString().padStart(2, '0')}
-                                </span>
-                                min
-                            </div>
-                            <div className="flex flex-col p-2 bg-neutral rounded-box text-neutral-content">
-                                <span className="font-mono text-4xl">
-                                    {timeLeft.seconds.toString().padStart(2, '0')}
-                                </span>
-                                sec
-                            </div>
-                        </div>
+    let response = '';
+    if (command === 'help') {
+      response = 'Available commands: help, clear, about, decode_binary <binary>, cd';
+    } else if (command === 'clear') {
+      setTypingOutput([]);
+      return;
+    } else if (command === 'about') {
+      response = 'GMTOS v1.0 - Developed by GMTStudio © 2025';
+    } else if (command === 'cd hero') {
+      response = 'Navigating to Hero page...';
+      await typeOutput(response);
+      navigate('/hero');
+      return;
+    } else if (command === 'cd') {
+      response = 'Command not found: cd, please specify a directory';
+    } else if (command.startsWith('decode_binary ')) {
+      const binary = command.replace('decode_binary ', '');
+      try {
+        const decoded = binary.split(' ')
+          .map(byte => String.fromCharCode(parseInt(byte, 2)))
+          .join('');
+        response = `Decoded message: ${decoded}`;
+      } catch {
+        response = 'Error: Invalid binary format';
+      }
+    } else {
+      response = `Command not found: ${command}`;
+    }
 
-                        <div className="w-full">
-                            <ul className="timeline timeline-vertical">
-                                <li>
-                                    <div className="timeline-start timeline-done">Planning</div>
-                                    <div className="timeline-middle">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            className="h-5 w-5 text-success"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div className="timeline-end timeline-box">Project Planning & Design</div>
-                                    <hr className="bg-success" />
-                                </li>
-                                <li className="timeline-active">
-                                    <hr className="bg-success" />
-                                    <div className="timeline-start">Development</div>
-                                    <div className="timeline-middle">
-                                        <div className="loading loading-spinner loading-md"></div>
-                                    </div>
-                                    <div className="timeline-end timeline-box">Core Development Phase</div>
-                                    <hr />
-                                </li>
-                                <li>
-                                    <hr />
-                                    <div className="timeline-start">Testing</div>
-                                    <div className="timeline-middle">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            className="h-5 w-5"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div className="timeline-end timeline-box">Testing & Quality Assurance</div>
-                                    <hr />
-                                </li>
-                                <li>
-                                    <hr />
-                                    <div className="timeline-start">Launch</div>
-                                    <div className="timeline-middle">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            className="h-5 w-5"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div className="timeline-end timeline-box">Website Launch</div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+    // Type out the response
+    setTypingOutput(prev => [...prev, '']);
+    await typeOutput(response);
+  };
 
-                    {/* Right Side - Chat */}
-                    <div className="w-2/3">
-                        <div className="bg-base-100 p-4 rounded-lg shadow-md flex flex-col h-[calc(100vh-200px)]">
-                            <div className="overflow-y-auto flex-grow mb-4">
-                                {chatHistory.map((chat, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`chat ${chat.sender === 'user' ? 'chat-end' : 'chat-start'}`}
-                                    >
-                                        <div className="chat-bubble">
-                                            {chat.displayedMessage}
-                                            {chat.isTyping && (
-                                                <span className="typing-indicator">
-                                                    <span className="dot">.</span>
-                                                    <span className="dot">.</span>
-                                                    <span className="dot">.</span>
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <form onSubmit={handleChatSubmit} className="flex">
-                                <input
-                                    type="text"
-                                    placeholder="Type your message here..."
-                                    className="input input-bordered w-full mr-2"
-                                    value={chatInput}
-                                    onChange={(e) => setChatInput(e.target.value)}
-                                />
-                                <button type="submit" className="btn btn-primary">
-                                    Send
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  // Render boot sequence
+  const renderBootSequence = () => (
+    <div>
+      {bootMessages.slice(0, bootPhase + 1).map((msg, i) => (
+        <div key={i} className="mb-2">{msg}</div>
+      ))}
+    </div>
+  );
+
+  // Render terminal
+  const renderTerminal = () => (
+    <div className="h-full flex flex-col">
+      <div ref={terminalRef} className="flex-grow overflow-auto mb-4 bg-black bg-opacity-70 p-2 rounded">
+        <div className="mb-4 text-green-400">GMTOS Terminal v1.0 - Type 'help' for available commands</div>
+        {typingOutput.map((line, i) => (
+          <div 
+            key={i} 
+            className={`mb-1 ${line.startsWith('>') ? 'text-white' : 'text-green-300'}`}
+          >
+            {line}
+          </div>
+        ))}
+      </div>
+      <form onSubmit={handleTerminalCommand} className="mt-2">
+        <div className="flex items-center">
+          <span className="mr-2 text-green-400">{'>'}</span>
+          <input
+            type="text"
+            value={terminalInput}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTerminalInput(e.target.value)}
+            className="bg-transparent flex-1 focus:outline-none text-green-400"
+            autoFocus
+          />
         </div>
-    );
-};
+      </form>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+            <Nav/>
+      <div className="flex p-2 gap-4 overflow-hidden flex-grow pt-[50px]">
+        {/* Left side - Computer Terminal */}
+        <div className="w-3/5 pt-[50px]">
+          <div className="h-full bg-gray-800 rounded-lg shadow-2xl overflow-hidden">
+            <div className="relative bg-gray-700 p-4 h-full flex flex-col">
+              <button 
+                onClick={handlePowerButton}
+                className="absolute top-4 right-4 w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center shadow-lg border-2 border-gray-700 hover:border-green-500 transition-colors duration-300 z-20"
+              >
+                <Power 
+                  className={`w-8 h-8 ${powerOn ? 'text-green-500' : 'text-gray-500'} transition-colors duration-300`}
+                />
+              </button>
+
+              <div className="flex-1 bg-black p-4 rounded font-mono text-sm overflow-auto crt relative">
+                {!powerOn && (
+                  <div className="flex items-center justify-center h-full">
+                    <MonitorOff size={48} />
+                  </div>
+                )}
+
+                {powerOn && !isLoggedIn && (
+                  <div>
+                    {renderBootSequence()}
+
+                    {bootPhase >= bootMessages.length && (
+                      <div className="mt-8">
+                        <div className="mb-4 text-yellow-400">SECURITY SYSTEM ACTIVE</div>
+                        <div className="mb-4">Binary Authentication Required:</div>
+                        <div className="mb-4 font-bold">{binaryCode}</div>
+                        <div className="mb-4 text-gray-400">Hint: Visit https://cryptii.com/pipes/text-to-binary to decode</div>
+                        {attempts > 2 && (
+                          <div className="mb-4 text-yellow-400">
+                            Additional Hint: Each byte represents one character
+                          </div>
+                        )}
+                        <form onSubmit={handleLogin} className="mt-4">
+                          <input
+                            type="password"
+                            value={password}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                            className="bg-black border border-green-400 text-green-400 px-2 py-1 w-64"
+                            placeholder="Enter decoded password"
+                          />
+                          <button type="submit" className="ml-2 border border-green-400 px-4 py-1 hover:bg-green-400 hover:text-black">
+                            Login
+                          </button>
+                        </form>
+                        {showError && (
+                          <div className="text-red-500 mt-2">Access Denied - Invalid Password</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {powerOn && isLoggedIn && !terminalOpen && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-10">
+                    <button
+                      onClick={() => setTerminalOpen(true)}
+                      className="flex items-center space-x-2 bg-green-500 text-black px-6 py-3 rounded-lg text-xl font-bold hover:bg-green-400 transition-colors duration-200 shadow-lg"
+                    >
+                      <TerminalIcon size={24} className="mr-2" />
+                      <span>Start Terminal</span>
+                    </button>
+                  </div>
+                )}
+
+                {powerOn && isLoggedIn && terminalOpen && renderTerminal()}
+              </div>
+
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2 text-gray-400">
+                  <Lock size={16} />
+                  <span>Security Level: Maximum</span>
+                </div>
+                <div className="text-gray-400">GMTOS v1.0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Progress and Timer */}
+        <div className="w-2/5 pt-[50px]">
+          <div className="h-full bg-gray-800 rounded-lg shadow-2xl p-6 flex flex-col items-center justify-center">
+            <h2 className="text-3xl font-bold text-white mb-8">
+              Website Development Progress
+            </h2>
+
+            <div className="flex flex-col items-center space-y-12">
+              <div
+                className="radial-progress text-primary"
+                style={{ '--value': timeLeft.progress, '--size': '12rem', '--thickness': '2px' } as React.CSSProperties}
+                role="progressbar"
+              >
+                <span className="text-4xl font-bold">{timeLeft.progress}%</span>
+              </div>
+              <h1>days until development completion</h1>
+              <div className="grid grid-cols-4 gap-6 text-center">
+                <div className="flex flex-col p-4 bg-neutral rounded-box text-neutral-content">
+                  <span className="countdown font-mono text-4xl">
+                    {timeLeft.days}
+                  </span>
+                  days
+                </div>
+                <div className="flex flex-col p-4 bg-neutral rounded-box text-neutral-content">
+                  <span className="countdown font-mono text-4xl">
+                    {timeLeft.hours.toString().padStart(2, '0')}
+                  </span>
+                  hours
+                </div>
+                <div className="flex flex-col p-4 bg-neutral rounded-box text-neutral-content">
+                  <span className="countdown font-mono text-4xl">
+                    {timeLeft.minutes.toString().padStart(2, '0')}
+                  </span>
+                  min
+                </div>
+                <div className="flex flex-col p-4 bg-neutral rounded-box text-neutral-content">
+                  <span className="countdown font-mono text-4xl">
+                    {timeLeft.seconds.toString().padStart(2, '0')}
+                  </span>
+                  sec
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default MainPage;

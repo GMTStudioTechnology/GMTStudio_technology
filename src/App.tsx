@@ -1,9 +1,17 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainPage from "./components/layout/MainPage";
+import Hero from "./components/UI/Hero";
+
 function App() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <MainPage/>
-    </div>
+    <Router>
+      <div className="min-h-screen flex flex-col">
+        <Routes>
+          <Route path="/" element={<MainPage/>} />
+          <Route path="/hero" element={<Hero />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
