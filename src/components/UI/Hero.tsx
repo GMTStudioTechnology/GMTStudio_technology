@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { motion, useAnimation, useMotionValue } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import pic1 from '../assets/pic1.png';
 import pic2 from '../assets/pic2.jpeg';
 import pic3 from '../assets/pic3.jpeg';
 import pic4 from "../assets/pic4.jpeg";
 import pic5 from "../assets/pic5.jpeg";
+
 interface CardData {
   category: string;
   title: string;
@@ -41,29 +42,28 @@ const data: CardData[] = [
 
 const Card: React.FC<{ card: CardData; index: number }> = React.memo(({ card, index }) => {
   const controls = useAnimation();
-  const y = useMotionValue(0);
 
-  const handleHoverStart = () => {
-    controls.start({ scale: 1.05, transition: { duration: 0.3 } });
-  };
+  const handleHoverStart = useCallback(() => {
+    controls.start({ scale: 1.05, transition: { duration: 0.3, ease: "easeOut" } });
+  }, [controls]);
 
-  const handleHoverEnd = () => {
-    controls.start({ scale: 1, transition: { duration: 0.3 } });
-  };
+  const handleHoverEnd = useCallback(() => {
+    controls.start({ scale: 1, transition: { duration: 0.3, ease: "easeOut" } });
+  }, [controls]);
 
   return (
     <motion.div
       className="relative flex-shrink-0 w-80 h-96 mx-3 rounded-2xl overflow-hidden cursor-pointer"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
       whileHover="hover"
       onHoverStart={handleHoverStart}
       onHoverEnd={handleHoverEnd}
     >
       <motion.div
         className="absolute inset-0 w-full h-full bg-cover bg-center"
-        style={{ backgroundImage: `url(${card.src})`, y }}
+        style={{ backgroundImage: `url(${card.src})` }}
         animate={controls}
       />
       <motion.div
@@ -91,25 +91,29 @@ const InfiniteCarousel: React.FC = () => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const scrollSpeed = 0.5; // Pixels per frame
 
   const extendedData = useMemo(() => [...data, ...data, ...data], []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current!.offsetLeft);
-    setScrollLeft(scrollRef.current!.scrollLeft);
+    setStartX(e.pageX - (scrollRef.current?.offsetLeft || 0));
+    setScrollLeft(scrollRef.current?.scrollLeft || 0);
+    setAutoScrollEnabled(false);
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || !scrollRef.current) return;
     e.preventDefault();
-    const x = e.pageX - scrollRef.current!.offsetLeft;
-    const walk = (x - startX) * 2;
-    scrollRef.current!.scrollLeft = scrollLeft - walk;
+    const x = e.pageX - (scrollRef.current.offsetLeft || 0);
+    const walk = (x - startX) * 1.5;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
   }, [isDragging, startX, scrollLeft]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setTimeout(() => setAutoScrollEnabled(true), 1000);
   }, []);
 
   const handleScroll = useCallback(() => {
@@ -125,54 +129,51 @@ const InfiniteCarousel: React.FC = () => {
     }
   }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
-      scrollRef.current!.scrollLeft -= 100;
-    } else if (e.key === 'ArrowRight') {
-      scrollRef.current!.scrollLeft += 100;
-    }
-  }, []);
-
   useEffect(() => {
-    if (!scrollRef.current || isHovered || isDragging) return;
+    if (!scrollRef.current || !autoScrollEnabled || isHovered || isDragging) return;
 
-    const scroll = () => {
+    let animationFrameId: number;
+    
+    const animate = () => {
       if (scrollRef.current) {
         const element = scrollRef.current;
-        const scrollWidth = element.scrollWidth / 3;
+        const maxScroll = element.scrollWidth / 3;
         
-        if (element.scrollLeft >= scrollWidth) {
-          element.scrollLeft = 0;
-        } else {
-          element.scrollLeft += 1;
+        element.scrollLeft += scrollSpeed;
+        
+        if (element.scrollLeft >= maxScroll * 2) {
+          element.scrollLeft = maxScroll;
         }
       }
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    const intervalId = setInterval(scroll, 30);
-    return () => clearInterval(intervalId);
-  }, [isHovered, isDragging]);
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [autoScrollEnabled, isHovered, isDragging, scrollSpeed]);
 
   return (
     <div 
       className="relative w-full overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        handleMouseUp();
+      }}
     >
       <div
         ref={scrollRef}
         className="flex overflow-x-scroll scrollbar-hide py-8"
         style={{ 
           scrollBehavior: isDragging ? 'auto' : 'smooth',
-          cursor: isDragging ? 'grabbing' : 'grab'
+          cursor: isDragging ? 'grabbing' : 'grab',
+          WebkitOverflowScrolling: 'touch'
         }}
         onScroll={handleScroll}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
       >
         <div className="flex space-x-4 pl-4">
           {extendedData.map((card, index) => (
