@@ -40,6 +40,8 @@ const data: CardData[] = [
   },
 ];
 
+
+
 const Card: React.FC<{ card: CardData; index: number }> = React.memo(({ card, index }) => {
   const controls = useAnimation();
 
@@ -92,7 +94,7 @@ const InfiniteCarousel: React.FC = () => {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
-  const scrollSpeed = 0.5; // Pixels per frame
+  const scrollSpeed = 0.5;
 
   const extendedData = useMemo(() => [...data, ...data, ...data], []);
 
@@ -154,7 +156,7 @@ const InfiniteCarousel: React.FC = () => {
 
   return (
     <div 
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden mb-16"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -163,11 +165,11 @@ const InfiniteCarousel: React.FC = () => {
     >
       <div
         ref={scrollRef}
-        className="flex overflow-x-scroll scrollbar-hide py-8"
+        className="flex overflow-x-scroll scrollbar-hide py-8 "
         style={{ 
           scrollBehavior: isDragging ? 'auto' : 'smooth',
           cursor: isDragging ? 'grabbing' : 'grab',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
         }}
         onScroll={handleScroll}
         onMouseDown={handleMouseDown}
@@ -182,8 +184,8 @@ const InfiniteCarousel: React.FC = () => {
         </div>
       </div>
       
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent pointer-events-none" />
     </div>
   );
 };
@@ -203,6 +205,7 @@ const GMTStudioCarousel: React.FC = () => {
               Discover What's Possible at GMTStudio
             </motion.h2>
             <InfiniteCarousel />
+
           </div>
         </div>
       </main>

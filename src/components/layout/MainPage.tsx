@@ -177,8 +177,8 @@ function MainPage() {
 
     if (command === 'cd hero') {
       setTypingOutput(prev => [...prev, '']);
-      await typeOutput('Navigating to Hero page...');
-      navigate('/hero');
+      await typeOutput('Navigating to Preview page...');
+      navigate('/preview');
       return;
     }
 
