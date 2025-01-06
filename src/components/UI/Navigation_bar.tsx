@@ -7,7 +7,7 @@ import {
   Server,
   Envelope
 } from '@gravity-ui/icons';
-
+import GMTLogo from "../assets/Gicon.png"
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
           >
             <div className="flex items-center space-x-2">
               <img
-              src="../public/assets/Gicon.png"
+              src = {GMTLogo}
               alt="GMTStudio Logo"
               className="h-12 w-12 rounded-full"
               />
