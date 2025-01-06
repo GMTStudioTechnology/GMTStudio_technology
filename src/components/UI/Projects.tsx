@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import pic1 from "../assets/pic1.png";
 import pic2 from "../assets/pic2.jpeg";
 import pic3 from "../assets/pic3.jpeg";
@@ -33,33 +33,45 @@ interface BentoGridItemProps {
 
 const BentoGrid: React.FC<BentoGridProps> = ({ children, className = '', selectedFilter }) => {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${className}`}>
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          const itemTags = child.props.tags || [];
-          const isVisible = selectedFilter === 'all' || itemTags.includes(selectedFilter);
-          
-          return (
-            <motion.div
-              initial={false}
-              animate={{
-                scale: isVisible ? 1 : 0.8,
-                opacity: isVisible ? 1 : 0,
-              }}
-              transition={{
-                duration: 0.2,
-                ease: "easeInOut"
-              }}
-              style={{
-                display: isVisible ? "block" : "none",
-              }}
-            >
-              {child}
-            </motion.div>
-          );
-        }
-        return null;
-      })}
+    <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${className} relative`}>
+      <AnimatePresence mode="sync">
+        {React.Children.map(children, (child, index) => {
+          if (React.isValidElement(child)) {
+            const itemTags = child.props.tags || [];
+            if (selectedFilter === 'all' || itemTags.includes(selectedFilter)) {
+              return (
+                <motion.div
+                  key={index}
+                  layout
+                  initial={{ 
+                    scale: 0.8,
+                    opacity: 0,
+                    y: 20
+                  }}
+                  animate={{ 
+                    scale: 1,
+                    opacity: 1,
+                    y: 0
+                  }}
+                  exit={{ 
+                    scale: 0.8,
+                    opacity: 0,
+                    y: -20
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    ease: [0.4, 0, 0.2, 1]
+                  }}
+                  className={child.props.className}
+                >
+                  {child}
+                </motion.div>
+              );
+            }
+          }
+          return null;
+        })}
+      </AnimatePresence>
     </div>
   );
 };
@@ -155,7 +167,7 @@ const BentoGridItem: React.FC<BentoGridItemProps> = ({
 
 const Projects: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const filters = ['all', 'AI', 'software', 'platform', 'under constructuction'];
+  const filters = ['all', 'AI', 'software', 'platform', 'under construction'];
 
   const items = [
     {
@@ -163,16 +175,16 @@ const Projects: React.FC = () => {
       description: "The Natural language processing based Artificial intelligence",
       header: <img src={pic1} alt="Mazs AI" className="w-full h-48 object-cover rounded-xl" />,
       icon: <Paperclip className="h-6 w-6" />,
-      tags: ['AI'],
-      link: "#AI"
+      tags: ["AI"],
+      link: ""
     },
     {
       title: "ThinkLink",
       description: "The multimodel AI-powered platform contains personal assistants, which can set the timer, create to do list, and so on.",
       header: <img src={pic2} alt="ThinkLink" className="w-full h-48 object-cover rounded-xl" />,
       icon: <File className="h-6 w-6" />,
-      tags: ["Software"],
-      link: "#Software"
+      tags: ["software"],
+      link: ""
     },
     {
       title: "GMT OS",
@@ -180,7 +192,7 @@ const Projects: React.FC = () => {
       header: <img src={pic3} alt="GMTOS - alpha" className="w-full h-48 object-cover rounded-xl" />,
       icon: <PencilToLine className="h-6 w-6" />,
       tags: ["platform"],
-      link: "#platform"
+      link: ""
     },
     {
       title: "(´;ω;`) under construction",
@@ -188,7 +200,7 @@ const Projects: React.FC = () => {
       header: <img src={pic4} alt="The Power of Communication" className="w-full h-48 object-cover rounded-xl" />,
       icon: <Trolley className="h-6 w-6" />,
       tags: ["under construction"],
-      link: "#under-construction"
+      link: ""
     },
     {
       title: "ヾ(･∀･`) under construction",
@@ -196,7 +208,7 @@ const Projects: React.FC = () => {
       header: <img src={pic5} alt="The Pursuit of Knowledge" className="w-full h-48 object-cover rounded-xl" />,
       icon: <Trolley className="h-6 w-6" />,
       tags: ["under construction"],
-      link: "#under-construction"
+      link: ""
     }
   ];
 
