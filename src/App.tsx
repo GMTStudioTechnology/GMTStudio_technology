@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainPage from "./components/layout/MainPage";
-import Hero from "./components/UI/Hero";
+import Preview from "./components/layout/preview";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <Routes>
           <Route path="/" element={<MainPage/>} />
-          <Route path="/hero" element={<Hero />} />
+          <Route path="/preview" element={<Preview />} />
         </Routes>
       </div>
     </Router>
