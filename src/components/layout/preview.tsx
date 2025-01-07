@@ -3,11 +3,11 @@ import Hero from "../UI/Hero";
 import Project from "../UI/Projects"
 const MainPage: React.FC = () => {
   return (
-    <div>
+    <div className="bg-black">
       <Navbar />
-    <div className="pt-10">
-        <Hero />
-    </div>
+    <div className ="pt-24">
+      <Hero/>
+      </div>
     <Project />
     </div>
   );

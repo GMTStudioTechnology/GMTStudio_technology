@@ -40,8 +40,6 @@ const data: CardData[] = [
   },
 ];
 
-
-
 const Card: React.FC<{ card: CardData; index: number }> = React.memo(({ card, index }) => {
   const controls = useAnimation();
 
@@ -156,7 +154,7 @@ const InfiniteCarousel: React.FC = () => {
 
   return (
     <div 
-      className="relative w-full overflow-hidden mb-16"
+      className="relative w-full overflow-hidden mb-8"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -165,7 +163,7 @@ const InfiniteCarousel: React.FC = () => {
     >
       <div
         ref={scrollRef}
-        className="flex overflow-x-scroll scrollbar-hide py-8 "
+        className="flex overflow-x-scroll scrollbar-hide py-8"
         style={{ 
           scrollBehavior: isDragging ? 'auto' : 'smooth',
           cursor: isDragging ? 'grabbing' : 'grab',
@@ -192,9 +190,9 @@ const InfiniteCarousel: React.FC = () => {
 
 const GMTStudioCarousel: React.FC = () => {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="pt-1 bg-black text-white pb-24">
       <main>
-        <div className="w-full py-20">
+        <div className="w-full ">
           <div className="max-w-7xl mx-auto px-4">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -205,7 +203,6 @@ const GMTStudioCarousel: React.FC = () => {
               Discover What's Possible at GMTStudio
             </motion.h2>
             <InfiniteCarousel />
-
           </div>
         </div>
       </main>
