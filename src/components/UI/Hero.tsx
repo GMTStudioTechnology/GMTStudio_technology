@@ -6,6 +6,59 @@ import pic3 from '../assets/pic3.jpeg';
 import pic4 from "../assets/pic4.jpeg";
 import pic5 from "../assets/pic5.jpeg";
 
+// Text Generation Effect Component
+const TextGenerateEffect: React.FC<{ text: string }> = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, 30);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, text]);
+
+  return (
+    <div className="font-bold">
+      {displayedText}
+    </div>
+  );
+};
+
+// Highlight Effect Component
+const Highlight: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <motion.span
+      className="relative inline-block"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay: 0.5,
+        ease: [0.4, 0.0, 0.2, 1],
+      }}
+    >
+      <span className="relative z-10">
+        {children}
+      </span>
+      <motion.span
+        className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg -z-10"
+        initial={{ scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{
+          duration: 0.6,
+          delay: 0.7,
+          ease: "easeOut"
+        }}
+      />
+    </motion.span>
+  );
+};
+
 interface CardData {
   category: string;
   title: string;
@@ -192,16 +245,21 @@ const GMTStudioCarousel: React.FC = () => {
   return (
     <div className="pt-1 bg-black text-white pb-24">
       <main>
-        <div className="w-full ">
+        <div className="w-full">
           <div className="max-w-7xl mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-5xl font-bold mb-12 text-center"
-            >
-              Discover What's Possible at GMTStudio
-            </motion.h2>
+            <div className="text-5xl font-bold mb-12 text-center flex flex-col items-center gap-2">
+              <TextGenerateEffect text="Discover What's Possible in" />
+              <Highlight>
+                <motion.span
+                  className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  GMTStudio
+                </motion.span>
+              </Highlight>
+            </div>
             <InfiniteCarousel />
           </div>
         </div>
