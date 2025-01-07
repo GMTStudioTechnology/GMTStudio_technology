@@ -31,12 +31,22 @@ interface BentoGridItemProps {
   className?: string;
   tags?: string[];
   link?: string;
+  isMobile?: boolean;
+}
+
+interface ImageProps {
+  className?: string;
+  alt?: string;
+  src: string;
 }
 
 // BentoGrid Component
 const BentoGrid: React.FC<BentoGridProps> = ({ children, className = '', selectedFilter }) => {
   return (
-    <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 ${className} relative`}>
+    <div className={`
+      hidden lg:grid lg:grid-cols-3 gap-6 ${className} relative
+      md:block
+    `}>
       <AnimatePresence mode="sync">
         {React.Children.map(children, (child, index) => {
           if (React.isValidElement(child)) {
@@ -64,6 +74,42 @@ const BentoGrid: React.FC<BentoGridProps> = ({ children, className = '', selecte
   );
 };
 
+// Mobile List View Component
+const MobileListView: React.FC<BentoGridProps> = ({ children, className = '', selectedFilter }) => {
+  return (
+    <div className={`
+      flex flex-col gap-3 lg:hidden ${className}
+    `}>
+      <AnimatePresence mode="sync">
+        {React.Children.map(children, (child, index) => {
+          if (React.isValidElement<BentoGridItemProps>(child)) {
+            const itemTags = child.props.tags || [];
+            if (selectedFilter === 'all' || itemTags.includes(selectedFilter)) {
+              return (
+                <motion.div
+                  key={index}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {React.cloneElement(child, { isMobile: true })}
+                </motion.div>
+              );
+            }
+          }
+          return null;
+        })}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const Image: React.FC<ImageProps> = ({ className, alt, src }) => {
+  return <img src={src} alt={alt} className={className} />;
+};
+
 // BentoGridItem Component
 const BentoGridItem: React.FC<BentoGridItemProps> = ({
   title,
@@ -72,10 +118,67 @@ const BentoGridItem: React.FC<BentoGridItemProps> = ({
   icon,
   className = '',
   tags = [],
-  link
+  link,
+  isMobile = false
 }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
+
+  const renderHeader = () => {
+    if (React.isValidElement<ImageProps>(header)) {
+      return (
+        <Image
+          src={header.props.src}
+          alt={header.props.alt || ''}
+          className="w-full h-full object-cover rounded-xl"
+        />
+      );
+    }
+    return header;
+  };
+
+  if (isMobile) {
+    return (
+      <div className="
+        group relative overflow-hidden
+        p-3 rounded-xl
+        bg-black
+        border border-white/30
+        hover:border-white/70
+        transition-all duration-300 ease-out
+      ">
+        <div className="flex gap-3">
+          <div className="w-24 h-24 flex-shrink-0">
+            {renderHeader()}
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 rounded-lg bg-gray-800/80 border border-gray-700">
+                {icon}
+              </div>
+              <h3 className="text-sm font-semibold text-white">{title}</h3>
+            </div>
+
+            <p className="text-gray-400 text-xs line-clamp-2 mb-2">
+              {description}
+            </p>
+
+            <div className="flex flex-wrap gap-1">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-2 py-0.5 text-xs rounded-full bg-gray-800/80 text-gray-400"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -106,9 +209,7 @@ const BentoGridItem: React.FC<BentoGridItemProps> = ({
           <div className="w-1/3 lg:w-full">
             <div className="relative w-full">
               <div className="h-[200px]">
-                {React.cloneElement(header as React.ReactElement, {
-                  className: "w-full h-full object-cover rounded-xl"
-                })}
+                {renderHeader()}
               </div>
             </div>
           </div>
@@ -235,6 +336,7 @@ const Projects: React.FC = () => {
           ))}
         </div>
 
+        {/* Desktop Bento Grid */}
         <BentoGrid selectedFilter={selectedFilter}>
           {items.map((item, i) => (
             <BentoGridItem
@@ -244,6 +346,16 @@ const Projects: React.FC = () => {
             />
           ))}
         </BentoGrid>
+
+        {/* Mobile List View */}
+        <MobileListView selectedFilter={selectedFilter}>
+          {items.map((item, i) => (
+            <BentoGridItem
+              key={i}
+              {...item}
+            />
+          ))}
+        </MobileListView>
       </div>
     </div>
   );
