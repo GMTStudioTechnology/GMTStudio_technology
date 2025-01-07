@@ -3,6 +3,7 @@ import Hero from "../UI/Hero";
 // import Project from "../UI/Projects"
 import Intro from "../UI/intro";
 import Testimonial from "../UI/Testimonial";
+//import VelocityScroll from "../UI/VelocityScroll";
 const MainPage: React.FC = () => {
   return (
     <div className="bg-black">
@@ -12,6 +13,7 @@ const MainPage: React.FC = () => {
         </div>
         <Intro text="experience the future of technology at GMTStudio platform"/>
       <Testimonial />
+
     </div>
   );
 };

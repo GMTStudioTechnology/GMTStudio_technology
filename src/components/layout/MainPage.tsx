@@ -321,7 +321,7 @@ function MainPage() {
                         <div className="mb-4 text-yellow-400">SECURITY SYSTEM ACTIVE</div>
                         <div className="mb-4">Binary Authentication Required:</div>
                         <div className="mb-4 font-bold">{binaryCode}</div>
-                        <div className="mb-4 text-gray-400">Hint: Visit https://cryptii.com/pipes/text-to-binary to decode</div>
+                        <div className="mb-4 text-gray-400">Hint: Visit https://www.rapidtables.com/convert/number/binary-to-ascii.html to decode</div>
                         {attempts > 2 && (
                           <div className="mb-4 text-yellow-400">
                             Additional Hint: Each byte represents one character
