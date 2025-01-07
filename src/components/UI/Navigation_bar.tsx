@@ -46,13 +46,15 @@ const Navbar: React.FC = () => {
             className="flex-shrink-0 flex items-center"
             whileHover={{ scale: 1.00 }}
           >
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
+            <a href="/preview"> {/* Wrap the image in an <a> tag */}
               <img
-              src = {GMTLogo}
-              alt="GMTStudio Logo"
-              className="h-12 w-12 rounded-full"
+                src={GMTLogo}
+                alt="GMTStudio Logo"
+                className="h-12 w-12 rounded-full"
               />
-            </div>
+            </a>
+          </div>
           </motion.div>
 
           {/* Enhanced Navigation Links */}

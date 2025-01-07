@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from '@gravity-ui/icons';
-import pic1 from "../assets/pic1.png";
-import pic2 from "../assets/pic2.jpeg";
+import MazsAI from "../assets/MazsAI.png";
+import ThinkLink from "../assets/ThinkLink.png"
 import pic3 from "../assets/pic3.jpeg";
 import pic4 from "../assets/pic4.jpeg";
 import pic5 from "../assets/pic5.jpeg";
@@ -185,13 +185,13 @@ export const Products: React.FC = () => {
       quote: "The Natural language processing based Artificial intelligence, which is capable of understanding and generating human language. The model ( Mazs AI - anatra v1.0 ) is still in trainning phase. ",
       name: "Mazs AI",
       designation: "Artificial intelligence",
-      src: pic1,
+      src: MazsAI,
     },
     {
       quote: "The multimodel AI-powered platform contains personal assistants. This software is designed to help user to make their life easier. For instance, the AI inside ( Mazs AI - ThinkLink v1 ) will help you create a to do task when you input a natural language sentence, it will summarize the words and create title, date, and description for you.",
       name: "ThinkLink",
       designation: "Software",
-      src: pic2,
+      src: ThinkLink,
     },
     {
       quote: "The next generation of operating system. I don't know what to say about this, it is now in development.",
