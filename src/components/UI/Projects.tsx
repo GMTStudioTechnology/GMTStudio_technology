@@ -6,6 +6,7 @@ import pic2 from "../assets/pic2.jpeg";
 import pic3 from "../assets/pic3.jpeg";
 import pic4 from "../assets/pic4.jpeg";
 import pic5 from "../assets/pic5.jpeg";
+import Navbar from "./Navigation_bar";
 import {
   Paperclip,
   File,
@@ -315,7 +316,9 @@ const Projects: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black py-8 md:py-12">
+    <div className="bg-black ">
+      <Navbar/>
+    <div className="min-h-screen bg-black py-8 md:py-12 mt-14">
       <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto px-4">
         <div className="flex flex-wrap gap-2 md:gap-3 justify-center">
           {filters.map((filter) => (
@@ -357,6 +360,7 @@ const Projects: React.FC = () => {
           ))}
         </MobileListView>
       </div>
+    </div>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import pic1 from '../assets/pic1.png';
-import pic2 from '../assets/pic2.jpeg';
-import pic3 from '../assets/pic3.jpeg';
-import pic4 from "../assets/pic4.jpeg";
-import pic5 from "../assets/pic5.jpeg";
+import pic1 from '../../assets/pic1.png';
+import pic2 from '../../assets/pic2.jpeg';
+import pic3 from '../../assets/pic3.jpeg';
+import pic4 from "../../assets/pic4.jpeg";
+import pic5 from "../../assets/pic5.jpeg";
 
 // Text Generation Effect Component
 const TextGenerateEffect: React.FC<{ text: string }> = ({ text }) => {

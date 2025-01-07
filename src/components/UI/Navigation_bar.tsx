@@ -14,10 +14,10 @@ const Navbar: React.FC = () => {
   const [searchFocused, setSearchFocused] = useState(false);
 
   const navigation = [
-    { name: "Home", href: "#", icon: <House className="w-5 h-5" /> },
-    { name: "About", href: "#", icon: <CircleInfo className="w-5 h-5" /> },
-    { name: "Services", href: "#", icon: <Server className="w-5 h-5" /> },
-    { name: "Contact", href: "#", icon: <Envelope className="w-5 h-5" /> },
+    { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
+    { name: "about us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
+    { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
+    { name: "GMTOS", href: "/gmtos", icon: <Envelope className="w-5 h-5" /> },
   ];
 
   // Handle navbar background on scroll

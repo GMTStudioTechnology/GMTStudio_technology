@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from '@gravity-ui/icons';
-import MazsAI from "../assets/MazsAI.png";
-import ThinkLink from "../assets/ThinkLink.png"
-import pic3 from "../assets/pic3.jpeg";
-import pic4 from "../assets/pic4.jpeg";
-import pic5 from "../assets/pic5.jpeg";
+import MazsAI from "../../assets/MazsAI.png";
+import ThinkLink from "../../assets/ThinkLink.png"
+import pic3 from "../../assets/pic3.jpeg";
+import pic4 from "../../assets/pic4.jpeg";
+import pic5 from "../../assets/pic5.jpeg";
 
 type Testimonial = {
   quote: string;
