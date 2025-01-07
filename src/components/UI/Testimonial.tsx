@@ -41,7 +41,7 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
     let interval: number | undefined;
     
     if (autoplay) {
-      interval = window.setInterval(handleNext, 7500);
+      interval = window.setInterval(handleNext, 15000);
     }
     
     return () => {
