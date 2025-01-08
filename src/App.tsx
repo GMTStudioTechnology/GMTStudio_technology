@@ -4,7 +4,7 @@ import Projects from "./components/UI/Projects"; // Importing Projects component
 import Preview from "./components/layout/preview";
 import AboutUs from "../src/components/UI/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+
 function App() {
   return (
     <Router>
@@ -15,7 +15,6 @@ function App() {
           <Route path="/preview" element={<Preview />} />
           <Route path="/aboutus" element={<AboutUs />} />
         </Routes>
-      <SpeedInsights/>
       </div>
     </Router>
   );
