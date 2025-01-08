@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import MazsAI from "../assets/MazsAI.png";
 import ThinkLink from "../assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
+import Video from "../assets/A.mov";
 
 interface ProjectSectionProps {
   title: string;
@@ -14,6 +15,7 @@ interface ProjectSectionProps {
   textColor?: string;
   features?: string[];
   category?: string;
+  video?: string;
 }
 
 const ProjectSection: React.FC<ProjectSectionProps> = ({
@@ -26,8 +28,22 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({
   textColor = "black",
   features,
   category,
+  video,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleVideoToggle = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   return (
     <section
@@ -118,15 +134,38 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({
               transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            <img
-              src={image}
-              alt={title}
-              className="w-full h-full object-cover"
-              style={{ 
-                maxHeight: '65vh',
-                filter: backgroundColor === "#000000" ? "brightness(1.1)" : "none"
-              }}
-            />
+            {video ? (
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  src={video}
+                  autoPlay
+                  loop
+                  muted
+                  className="w-full h-full object-cover"
+                  style={{ 
+                    maxHeight: '65vh',
+                    filter: backgroundColor === "#000000" ? "brightness(1.1)" : "none"
+                  }}
+                />
+                <button
+                  onClick={handleVideoToggle}
+                  className="absolute bottom-4 right-4 bg-white text-black px-4 py-2 rounded-full"
+                >
+                  {isPlaying ? "Pause" : "Play"}
+                </button>
+              </div>
+            ) : (
+              <img
+                src={image}
+                alt={title}
+                className="w-full h-full object-cover"
+                style={{ 
+                  maxHeight: '65vh',
+                  filter: backgroundColor === "#000000" ? "brightness(1.1)" : "none"
+                }}
+              />
+            )}
           </div>
         </motion.div>
       </div>
@@ -146,6 +185,7 @@ const Projects = () => {
       textColor: "white",
       category: "Artificial Intelligence",
       features: ["Neural Processing", "Advanced ML", "Real-time Analysis"],
+      video: Video,
     },
     {
       title: "ThinkLink",
