@@ -74,7 +74,7 @@ export default function ChatInput() {
   const catMemes = [Meme1, Meme3, Meme2,];
 
   const getRandomResponse = () => {
-    const shouldShowMeme = Math.random() < 0.5; // 10% chance for meme
+    const shouldShowMeme = Math.random() < 0.3; // 10% chance for meme
     
     if (shouldShowMeme) {
       const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
