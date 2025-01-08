@@ -1,40 +1,215 @@
 'use client'
 
 import { Plus, Globe, Microphone, Gear, Circles5Random } from '@gravity-ui/icons'
+import { useState, useEffect } from 'react'
+import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
+
+const TextGenerateEffect = ({
+  words,
+  className,
+  filter = true,
+  duration = 0.5,
+}: {
+  words: string;
+  className?: string;
+  filter?: boolean;
+  duration?: number;
+}) => {
+  const [scope, animate] = useAnimate();
+  const wordsArray = words.split(" ");
+
+  useEffect(() => {
+    animate(
+      "span",
+      {
+        opacity: 1,
+        filter: filter ? "blur(0px)" : "none",
+      },
+      {
+        duration: duration,
+        delay: stagger(0.2),
+      }
+    );
+  }, [scope.current, animate, duration, filter]);
+
+  return (
+    <div className={`font-bold ${className || ''}`}>
+      <motion.div ref={scope}>
+        {wordsArray.map((word, idx) => (
+          <motion.span
+            key={word + idx}
+            className="text-white opacity-0"
+            style={{
+              filter: filter ? "blur(10px)" : "none",
+              display: "inline-block",
+              marginRight: "4px"
+            }}
+          >
+            {word}
+          </motion.span>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
 
 export default function ChatInput() {
+  const [message, setMessage] = useState('')
+  const [conversation, setConversation] = useState<{ sender: string, text: string }[]>([])
+  const [isThinking, setIsThinking] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!message.trim() || isThinking) return
+
+    const userMessage = { sender: 'user', text: message }
+    setConversation([...conversation, userMessage])
+    setMessage('')
+    setIsThinking(true)
+
+    setTimeout(() => {
+      let botResponse = ''
+      if (message.toLowerCase() === 'hi') {
+        botResponse = "Hello! How can I assist you today?"
+      } else if (message.toLowerCase() === 'what is 10 ** log 3') {
+        botResponse = "The answer for this will be 3. Here is the reason why: 10 raised to the power of log base 10 of 3 is 3."
+      } else if (message.toLowerCase() === 'who are you?'){
+        botResponse = "I'm Mazs AI created by GMTStudio, is there any question you would like to ask?"
+      }else {
+        botResponse = "I'm sorry, I don't understand that question."
+      }
+
+      const botMessage = { sender: 'bot', text: botResponse }
+      setConversation(prev => [...prev, botMessage])
+      setIsThinking(false)
+    }, 2000)
+  }
+
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <div className="relative flex items-center gap-2 rounded-[24px] bg-black border border-white mt-32 py-4 px-4 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors">
-            <Plus className="h-5 w-5" />
-            <span className="text-sm text-gray-400">Attach</span>
-          </button>
-          <button className="p-1 text-white hover:text-gray-200 transition-colors">
-            <Globe className="h-5 w-5" />
-          </button>
-          <button className="p-1 text-white hover:text-gray-200 transition-colors">
-            <Gear className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <input 
-          type="text"
-          placeholder="Message Mazs AI ..."
-          className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-gray-300 min-w-0"
-        />
-        
-        <div className="flex gap-2">
-          <button className="p-1 text-white hover:text-gray-200 transition-colors">
-            <Microphone className="h-5 w-5" />
-          </button>
-          <button className="p-1 text-white hover:text-gray-200 transition-colors">
-            <Circles5Random className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
+    <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4">
+      <motion.div 
+        className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
+        initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
+        animate={{ 
+          boxShadow: conversation.length > 0 || isThinking 
+            ? "0 0 20px rgba(255,255,255,0.1)" 
+            : "0 0 0 rgba(255,255,255,0)"
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <AnimatePresence>
+            {(conversation.length > 0 || isThinking) && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: 400 }}
+                exit={{ height: 0 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20
+                }}
+                className="border-b border-white/10"
+              >
+                <div className="h-full overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  {conversation.map((msg, idx) => (
+                    <motion.div 
+                      key={idx}
+                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className={`rounded-2xl px-4 py-2 ${msg.sender === 'user' ? 'bg-blue-500/80 text-white' : 'bg-white/10 text-white'}`}>
+                        {msg.sender === 'bot' ? (
+                          <TextGenerateEffect
+                            words={msg.text}
+                            className="text-sm"
+                            filter={true}
+                            duration={0.5}
+                          />
+                        ) : (
+                          msg.text
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {isThinking && (
+                    <motion.div 
+                      className="flex gap-2 items-center p-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            className="w-2 h-2 bg-white/80 rounded-full"
+                            animate={{ y: ["0%", "-50%", "0%"] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: i * 0.2,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex items-center gap-2 p-4 bg-transparent">
+            <motion.div 
+              className="flex items-center gap-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+                <Plus className="h-5 w-5" />
+                <span className="text-sm text-white/60">Attach</span>
+              </button>
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+                <Globe className="h-5 w-5" />
+              </button>
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+                <Gear className="h-5 w-5" />
+              </button>
+            </motion.div>
+            
+            <input 
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Message Mazs AI ..."
+              className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-white/40 min-w-0"
+            />
+            
+            <motion.div 
+              className="flex gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+                <Microphone className="h-5 w-5" />
+              </button>
+              <button 
+                type="submit" 
+                className="p-1 text-white/80 hover:text-white transition-colors"
+                disabled={isThinking}
+              >
+                <Circles5Random className="h-5 w-5" />
+              </button>
+            </motion.div>
+          </div>
+        </form>
+      </motion.div>
     </div>
   )
 }
-

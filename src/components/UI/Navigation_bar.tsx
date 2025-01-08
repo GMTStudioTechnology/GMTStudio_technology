@@ -58,13 +58,13 @@ const Navbar: React.FC = () => {
           </motion.div>
 
           {/* Enhanced Navigation Links */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
+            <div className="hidden md:flex md:items-center md:space-x-10">
             {navigation.map((item) => (
               <motion.a
                 key={item.name}
                 href={item.href}
                 whileHover={{ scale: 1.05 }}
-                className="group flex items-center space-x-1 text-black hover:text-indigo-600 transition-all duration-300"
+                className="group flex items-center space-x-2 text-black hover:text-indigo-600 transition-all duration-300"
               >
                 <span className="text-lg">{item.icon}</span>
                 <span className="relative">

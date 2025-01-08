@@ -194,11 +194,11 @@ export const Timeline = () => {
     <Navbar/>
     <div className="w-full bg-white dark:bg-neutral-950 font-sans md:px-10 mt-12" ref={containerRef}>
       <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-        <div className="max-w-2xl">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 text-black dark:text-white">
+          <div className="max-w-3xl">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 text-black dark:text-white">
             About US
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300 text-lg leading-relaxed">
+          <p className="text-neutral-700 dark:text-neutral-300 text-xl leading-relaxed">
             We are a bunch of student who want to enhance the user experience quality to perfect, and we also want to make some games and software to improve the whole industry.
           </p>
         </div>
