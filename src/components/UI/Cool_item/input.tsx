@@ -4,6 +4,10 @@ import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown }
 import data from './data.json'
 import { useState, useEffect } from 'react'
 import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
+import Meme1 from "../../assets/Meme.png"
+import Meme2 from "../../assets/Meme_1.png"
+import Meme3 from "../../assets/Meme_2.png"
+
 
 const TextGenerateEffect = ({
   words,
@@ -54,34 +58,67 @@ const TextGenerateEffect = ({
   );
 };
 
+interface Message {
+  sender: string;
+  text: string;
+  type?: 'text' | 'image';
+  image?: string;
+}
+
 export default function ChatInput() {
   const [message, setMessage] = useState<string>('')
-  const [conversation, setConversation] = useState<{ sender: string, text: string }[]>([])
+  const [conversation, setConversation] = useState<Message[]>([])
   const [isThinking, setIsThinking] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
+  const catMemes = [Meme1, Meme3, Meme2,];
+
   const getRandomResponse = () => {
+    const shouldShowMeme = Math.random() < 0.5; // 10% chance for meme
+    
+    if (shouldShowMeme) {
+      const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
+      return {
+        type: 'image' as const,
+        text: '',
+        image: catMemes[randomMemeIndex]
+      };
+    }
+
     const responses = data.AI?.answer || [];
     if (responses.length === 0) {
-        return "I'm not sure how to respond to that.";
+      return {
+        type: 'text' as const,
+        text: "I'm not sure how to respond to that."
+      };
     }
     
     const randomIndex = Math.floor(Math.random() * responses.length);
-    return responses[randomIndex];
+    return {
+      type: 'text' as const,
+      text: responses[randomIndex]
+    };
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!message.trim() || isThinking) return
 
-    const userMessage = { sender: 'user', text: message }
+    const userMessage = { sender: 'user', text: message, type: 'text' as const }
     setConversation([...conversation, userMessage])
     setMessage('')
     setIsThinking(true)
+    
+    if (!isExpanded) {
+      setIsExpanded(true)
+    }
 
     setTimeout(() => {
       const botResponse = getRandomResponse()
-      const botMessage = { sender: 'bot', text: botResponse }
+      const botMessage = { 
+        sender: 'bot', 
+        ...botResponse
+      }
       setConversation(prev => [...prev, botMessage])
       setIsThinking(false)
     }, 2000)
@@ -143,7 +180,16 @@ export default function ChatInput() {
                       transition={{ duration: 0.3 }}
                     >
                       <div className={`rounded-2xl px-4 py-2 ${msg.sender === 'user' ? 'bg-blue-500/80 text-white' : 'bg-white/10 text-white'}`}>
-                        {msg.sender === 'bot' ? (
+                        {msg.type === 'image' ? (
+                          <motion.img 
+                            src={msg.image} 
+                            alt="Cat Meme"
+                            className="max-w-[200px] rounded-lg"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        ) : msg.sender === 'bot' ? (
                           <TextGenerateEffect
                             words={msg.text}
                             className="text-sm"
@@ -242,4 +288,3 @@ export default function ChatInput() {
     </div>
   )
 }
-
