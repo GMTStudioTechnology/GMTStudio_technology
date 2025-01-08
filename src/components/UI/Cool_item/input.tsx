@@ -1,13 +1,13 @@
 'use client'
 
-import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown } from '@gravity-ui/icons'
+import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown, Keyboard } from '@gravity-ui/icons'
 import data from './data.json'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
 import Meme1 from "../../assets/Meme.png"
 import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
-
+import Meme4 from "../../assets/Meme_3.png"
 
 const TextGenerateEffect = ({
   words,
@@ -70,11 +70,51 @@ export default function ChatInput() {
   const [conversation, setConversation] = useState<Message[]>([])
   const [isThinking, setIsThinking] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const lastInteractionRef = useRef<number>(Date.now())
+  const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const catMemes = [Meme1, Meme3, Meme2,];
+  const catMemes = [Meme1, Meme3, Meme2, Meme4];
+
+  const resetCollapseTimeout = () => {
+    if (collapseTimeoutRef.current) {
+      clearTimeout(collapseTimeoutRef.current)
+    }
+    lastInteractionRef.current = Date.now()
+    setIsCollapsed(false)
+
+    collapseTimeoutRef.current = setTimeout(() => {
+      if (Date.now() - lastInteractionRef.current >= 5000) {
+        setIsCollapsed(true)
+        setIsExpanded(false)
+      }
+    }, 5000)
+  }
+
+  useEffect(() => {
+    resetCollapseTimeout()
+    return () => {
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleInteraction = () => {
+    resetCollapseTimeout()
+  }
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [conversation, isThinking])
 
   const getRandomResponse = () => {
-    const shouldShowMeme = Math.random() < 0.3; // 10% chance for meme
+    const shouldShowMeme = Math.random() < 0.3;
     
     if (shouldShowMeme) {
       const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
@@ -104,6 +144,7 @@ export default function ChatInput() {
     e.preventDefault()
     if (!message.trim() || isThinking) return
 
+    resetCollapseTimeout()
     const userMessage = { sender: 'user', text: message, type: 'text' as const }
     setConversation([...conversation, userMessage])
     setMessage('')
@@ -124,28 +165,54 @@ export default function ChatInput() {
     }, 2000)
   }
 
+  const handleExpand = () => {
+    setIsCollapsed(false)
+    setIsExpanded(true)
+    resetCollapseTimeout()
+  }
+
   const handleAttach = () => {
+    resetCollapseTimeout()
     alert('Attach button clicked')
   }
 
   const handleGlobe = () => {
+    resetCollapseTimeout()
     alert('Globe button clicked')
   }
 
   const handleGear = () => {
+    resetCollapseTimeout()
     alert('Gear button clicked')
   }
 
   const handleMicrophone = () => {
+    resetCollapseTimeout()
     alert('Microphone button clicked')
   }
 
   const toggleExpand = () => {
+    resetCollapseTimeout()
     setIsExpanded(!isExpanded)
   }
 
+  if (isCollapsed) {
+    return (
+      <div className="fixed bottom-4 right-4">
+        <motion.button
+          onClick={handleExpand}
+          className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Keyboard className="h-6 w-6" />
+        </motion.button>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4">
+    <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4" onMouseEnter={handleInteraction}>
       <motion.div 
         className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
         initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
@@ -226,6 +293,7 @@ export default function ChatInput() {
                       </div>
                     </motion.div>
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
               </motion.div>
             )}
@@ -253,7 +321,10 @@ export default function ChatInput() {
             <input 
               type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                resetCollapseTimeout()
+              }}
               placeholder="Message Mazs AI ..."
               className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-white/40 min-w-0"
             />
