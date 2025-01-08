@@ -3,6 +3,7 @@ import Hero from "../UI/MainPage/Hero";
 // import Project from "../UI/Projects"
 import Intro from "../UI/MainPage/intro";
 import Testimonial from "../UI/MainPage/Testimonial";
+
 const MainPage: React.FC = () => {
   return (
     <div className="bg-black">
@@ -12,7 +13,9 @@ const MainPage: React.FC = () => {
         </div>
         <Intro text="Experience well enhanced tools at GMTStudio" />
       <Testimonial />
+
     </div>
+
   );
 };
 export default MainPage;

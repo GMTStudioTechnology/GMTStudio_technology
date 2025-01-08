@@ -4,9 +4,10 @@ import Projects from "./components/UI/Projects"; // Importing Projects component
 import Preview from "./components/layout/preview";
 import AboutUs from "../src/components/UI/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
-
+import Input from "./components/UI/Cool_item/input"
 function App() {
   return (
+    <div className="App">
     <Router>
       <div className="min-h-screen flex flex-col">
         <Routes>
@@ -16,7 +17,10 @@ function App() {
           <Route path="/aboutus" element={<AboutUs />} />
         </Routes>
       </div>
+
     </Router>
+    <Input/>
+    </div>
   );
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
-import { Plus, Globe, Microphone, Gear, Circles5Random } from '@gravity-ui/icons'
+import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown } from '@gravity-ui/icons'
+import data from './data.json'
 import { useState, useEffect } from 'react'
 import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
 
@@ -30,7 +31,7 @@ const TextGenerateEffect = ({
         delay: stagger(0.2),
       }
     );
-  }, [scope.current, animate, duration, filter]);
+  }, [animate, duration, filter]);
 
   return (
     <div className={`font-bold ${className || ''}`}>
@@ -54,9 +55,20 @@ const TextGenerateEffect = ({
 };
 
 export default function ChatInput() {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
   const [conversation, setConversation] = useState<{ sender: string, text: string }[]>([])
   const [isThinking, setIsThinking] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const getRandomResponse = () => {
+    const responses = data.AI?.answer || [];
+    if (responses.length === 0) {
+        return "I'm not sure how to respond to that.";
+    }
+    
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    return responses[randomIndex];
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,17 +80,7 @@ export default function ChatInput() {
     setIsThinking(true)
 
     setTimeout(() => {
-      let botResponse = ''
-      if (message.toLowerCase().includes('hi')) {
-        botResponse = "Hello! How can I assist you today?"
-      } else if (message.toLowerCase().includes('log')) {
-        botResponse = "The answer for this will be 3. Here is the reason why: 10 raised to the power of log base 10 of 3 is 3."
-      } else if (message.toLowerCase().includes('who are you')){
-        botResponse = "I'm Mazs AI created by GMTStudio, is there any question you would like to ask?"
-      } else {
-        botResponse = "I'm sorry, I don't understand that question."
-      }
-
+      const botResponse = getRandomResponse()
       const botMessage = { sender: 'bot', text: botResponse }
       setConversation(prev => [...prev, botMessage])
       setIsThinking(false)
@@ -101,6 +103,10 @@ export default function ChatInput() {
     alert('Microphone button clicked')
   }
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded)
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4">
       <motion.div 
@@ -115,11 +121,11 @@ export default function ChatInput() {
       >
         <form onSubmit={handleSubmit} className="flex flex-col">
           <AnimatePresence>
-            {(conversation.length > 0 || isThinking) && (
+            {isExpanded && (
               <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: 400 }}
-                exit={{ height: 0 }}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
                 transition={{ 
                   type: "spring",
                   stiffness: 200,
@@ -127,7 +133,7 @@ export default function ChatInput() {
                 }}
                 className="border-b border-white/10"
               >
-                <div className="h-full overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className="h-[400px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                   {conversation.map((msg, idx) => (
                     <motion.div 
                       key={idx}
@@ -222,6 +228,13 @@ export default function ChatInput() {
               >
                 <Circles5Random className="h-5 w-5" />
               </button>
+              <button 
+                type="button" 
+                className="p-1 text-white/80 hover:text-white transition-colors"
+                onClick={toggleExpand}
+              >
+                {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+              </button>
             </motion.div>
           </div>
         </form>
@@ -229,3 +242,4 @@ export default function ChatInput() {
     </div>
   )
 }
+
