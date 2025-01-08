@@ -2,7 +2,7 @@
 
 import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown, Keyboard } from '@gravity-ui/icons'
 import data from './data.json'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
 import Meme1 from "../../assets/Meme.png"
 import Meme2 from "../../assets/Meme_1.png"
@@ -38,7 +38,7 @@ const TextGenerateEffect = ({
   }, [animate, duration, filter]);
 
   return (
-    <div className={`font-bold ${className || ''}`}>
+    <div className={`font-normal ${className || ''}`}>
       <motion.div ref={scope}>
         {wordsArray.map((word, idx) => (
           <motion.span
@@ -63,6 +63,8 @@ interface Message {
   text: string;
   type?: 'text' | 'image';
   image?: string;
+  status: 'sent' | 'delivered' | 'read';
+  timestamp: Date;
 }
 
 export default function ChatInput() {
@@ -74,23 +76,30 @@ export default function ChatInput() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const lastInteractionRef = useRef<number>(Date.now())
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isExpandedRef = useRef(isExpanded)
 
   const catMemes = [Meme1, Meme3, Meme2, Meme4];
 
-  const resetCollapseTimeout = () => {
-    if (collapseTimeoutRef.current) {
-      clearTimeout(collapseTimeoutRef.current)
-    }
-    lastInteractionRef.current = Date.now()
-    setIsCollapsed(false)
+  // Update ref when isExpanded changes
+  useEffect(() => {
+    isExpandedRef.current = isExpanded
+  }, [isExpanded])
 
-    collapseTimeoutRef.current = setTimeout(() => {
-      if (Date.now() - lastInteractionRef.current >= 5000) {
-        setIsCollapsed(true)
-        setIsExpanded(false)
+  const resetCollapseTimeout = useCallback(() => {
+    if (!isExpandedRef.current) {
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current)
       }
-    }, 5000)
-  }
+      lastInteractionRef.current = Date.now()
+      setIsCollapsed(false)
+
+      collapseTimeoutRef.current = setTimeout(() => {
+        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 5000) {
+          setIsCollapsed(true)
+        }
+      }, 5000)
+    }
+  }, [])
 
   useEffect(() => {
     resetCollapseTimeout()
@@ -99,10 +108,12 @@ export default function ChatInput() {
         clearTimeout(collapseTimeoutRef.current)
       }
     }
-  }, [])
+  }, [resetCollapseTimeout])
 
   const handleInteraction = () => {
-    resetCollapseTimeout()
+    if (!isExpanded) {
+      resetCollapseTimeout()
+    }
   }
 
   const scrollToBottom = () => {
@@ -144,8 +155,14 @@ export default function ChatInput() {
     e.preventDefault()
     if (!message.trim() || isThinking) return
 
-    resetCollapseTimeout()
-    const userMessage = { sender: 'user', text: message, type: 'text' as const }
+    const userMessage: Message = { 
+      sender: 'user', 
+      text: message, 
+      type: 'text',
+      status: 'sent',
+      timestamp: new Date()
+    }
+    
     setConversation([...conversation, userMessage])
     setMessage('')
     setIsThinking(true)
@@ -154,13 +171,32 @@ export default function ChatInput() {
       setIsExpanded(true)
     }
 
+    // Simulate message status updates
+    setTimeout(() => {
+      setConversation(prev => 
+        prev.map((msg, idx) => 
+          idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
+        )
+      )
+    }, 1000)
+
     setTimeout(() => {
       const botResponse = getRandomResponse()
-      const botMessage = { 
-        sender: 'bot', 
-        ...botResponse
+      const botMessage: Message = { 
+        sender: 'bot',
+        status: 'read',
+        timestamp: new Date(),
+        text: botResponse.text || '',
+        type: botResponse.type,
+        image: botResponse.image
       }
-      setConversation(prev => [...prev, botMessage])
+      
+      setConversation(prev => [
+        ...prev.map((msg, idx) => 
+          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+        ),
+        botMessage
+      ])
       setIsThinking(false)
     }, 2000)
   }
@@ -168,35 +204,39 @@ export default function ChatInput() {
   const handleExpand = () => {
     setIsCollapsed(false)
     setIsExpanded(true)
-    resetCollapseTimeout()
   }
 
   const handleAttach = () => {
-    resetCollapseTimeout()
     alert('Attach button clicked')
   }
 
   const handleGlobe = () => {
-    resetCollapseTimeout()
     alert('Globe button clicked')
   }
 
   const handleGear = () => {
-    resetCollapseTimeout()
     alert('Gear button clicked')
   }
 
   const handleMicrophone = () => {
-    resetCollapseTimeout()
     alert('Microphone button clicked')
   }
 
   const toggleExpand = () => {
-    resetCollapseTimeout()
-    setIsExpanded(!isExpanded)
+    const newExpandedState = !isExpanded
+    setIsExpanded(newExpandedState)
+    if (!newExpandedState) {
+      resetCollapseTimeout()
+    }
   }
 
-  if (isCollapsed) {
+  const MessageStatus = ({ status }: { status: Message['status'] }) => {
+    if (status === 'sent') return <span className="text-xs text-gray-400">Sent</span>
+    if (status === 'delivered') return <span className="text-xs text-gray-400">Delivered</span>
+    return <span className="text-xs text-blue-400">Read</span>
+  }
+
+  if (isCollapsed && !isExpanded) {
     return (
       <div className="fixed bottom-4 right-4">
         <motion.button
@@ -241,12 +281,18 @@ export default function ChatInput() {
                   {conversation.map((msg, idx) => (
                     <motion.div 
                       key={idx}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                      className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} mb-4`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className={`rounded-2xl px-4 py-2 ${msg.sender === 'user' ? 'bg-blue-500/80 text-white' : 'bg-white/10 text-white'}`}>
+                      <div 
+                        className={`rounded-2xl px-4 py-2 max-w-[70%] ${
+                          msg.sender === 'user' 
+                            ? 'bg-blue-500/80 text-white' 
+                            : 'bg-white/10 text-white'
+                        }`}
+                      >
                         {msg.type === 'image' ? (
                           <motion.img 
                             src={msg.image} 
@@ -264,9 +310,14 @@ export default function ChatInput() {
                             duration={0.5}
                           />
                         ) : (
-                          msg.text
+                          <span className="text-sm">{msg.text}</span>
                         )}
                       </div>
+                      {msg.sender === 'user' && (
+                        <div className="mt-1">
+                          <MessageStatus status={msg.status} />
+                        </div>
+                      )}
                     </motion.div>
                   ))}
                   
@@ -281,7 +332,7 @@ export default function ChatInput() {
                         {[0, 1, 2].map((i) => (
                           <motion.div
                             key={i}
-                            className="w-2 h-2 bg-white/80 rounded-full"
+                            className="w-2 h-2 bg-gray-400 rounded-full"
                             animate={{ y: ["0%", "-50%", "0%"] }}
                             transition={{
                               duration: 0.6,
@@ -323,9 +374,11 @@ export default function ChatInput() {
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value)
-                resetCollapseTimeout()
+                if (!isExpanded) {
+                  resetCollapseTimeout()
+                }
               }}
-              placeholder="Message Mazs AI ..."
+              placeholder="Message to Mazs AI "
               className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-white/40 min-w-0"
             />
             
