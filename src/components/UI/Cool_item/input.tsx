@@ -69,13 +69,13 @@ export default function ChatInput() {
 
     setTimeout(() => {
       let botResponse = ''
-      if (message.toLowerCase() === 'hi') {
+      if (message.toLowerCase().includes('hi')) {
         botResponse = "Hello! How can I assist you today?"
-      } else if (message.toLowerCase() === 'what is 10 ** log 3') {
+      } else if (message.toLowerCase().includes('log')) {
         botResponse = "The answer for this will be 3. Here is the reason why: 10 raised to the power of log base 10 of 3 is 3."
-      } else if (message.toLowerCase() === 'who are you?'){
+      } else if (message.toLowerCase().includes('who are you')){
         botResponse = "I'm Mazs AI created by GMTStudio, is there any question you would like to ask?"
-      }else {
+      } else {
         botResponse = "I'm sorry, I don't understand that question."
       }
 
@@ -83,6 +83,22 @@ export default function ChatInput() {
       setConversation(prev => [...prev, botMessage])
       setIsThinking(false)
     }, 2000)
+  }
+
+  const handleAttach = () => {
+    alert('Attach button clicked')
+  }
+
+  const handleGlobe = () => {
+    alert('Globe button clicked')
+  }
+
+  const handleGear = () => {
+    alert('Gear button clicked')
+  }
+
+  const handleMicrophone = () => {
+    alert('Microphone button clicked')
   }
 
   return (
@@ -170,14 +186,14 @@ export default function ChatInput() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+              <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors" onClick={handleAttach}>
                 <Plus className="h-5 w-5" />
                 <span className="text-sm text-white/60">Attach</span>
               </button>
-              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGlobe}>
                 <Globe className="h-5 w-5" />
               </button>
-              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGear}>
                 <Gear className="h-5 w-5" />
               </button>
             </motion.div>
@@ -196,7 +212,7 @@ export default function ChatInput() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors">
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleMicrophone}>
                 <Microphone className="h-5 w-5" />
               </button>
               <button 
