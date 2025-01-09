@@ -50,7 +50,7 @@ const Footer = () => {
           {/* Brand Section */}
           <motion.div variants={itemVariants} className="space-y-6">
             <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-              Company Name
+              GMTStudio
             </h3>
             <div className="flex space-x-6">
               {socialIcons.map((social) => (

@@ -65,6 +65,7 @@ interface Message {
   image?: string;
   status: 'sent' | 'delivered' | 'read';
   timestamp: Date;
+  file?: File | null; // For file attachments
 }
 
 interface Task {
@@ -77,7 +78,11 @@ const DIRECT_RESPONSES: Record<string, string> = {
   'hi': 'hai ya! How can I help you?',
   'hey': 'yallow! How can I help you?',
   '': 'Hola! ¿En puedo ayudarte?',
-  'ciao': 'Ciao! Come posso aiutarti?'
+  'ciao': 'Ciao! Come posso aiutarti?',
+  'who are you ?':'I am Mazs AI, An AI that chat with you in a nonsense way. ',
+  'what is your purpose ?':'pass the butter ( pass )',
+  'who the fuck are you ?' : 'yourself',
+
 };
 
 export default function ChatInput() {
@@ -89,10 +94,16 @@ export default function ChatInput() {
   const [, setThinkLinkTaskDescription] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAttachOpen, setIsAttachOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null) // Added file state
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const lastInteractionRef = useRef<number>(Date.now())
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isExpandedRef = useRef(isExpanded)
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   const catMemes = [Meme1, Meme3, Meme2, Meme4];
 
@@ -139,107 +150,116 @@ export default function ChatInput() {
     scrollToBottom()
   }, [conversation, isThinking])
 
-  const getRandomResponse = (userMessage: string) => {
-    const lowercaseMessage = userMessage.toLowerCase().trim();
-    
-    if (DIRECT_RESPONSES[lowercaseMessage]) {
-      return {
-        type: 'text' as const,
-        text: DIRECT_RESPONSES[lowercaseMessage]
-      };
+    const getRandomResponse = (userMessage: string, file?: File | null) => {
+        const lowercaseMessage = userMessage.toLowerCase().trim();
+
+        if (DIRECT_RESPONSES[lowercaseMessage]) {
+            return {
+                type: 'text' as const,
+                text: DIRECT_RESPONSES[lowercaseMessage]
+            };
+        }
+
+      if (file) {
+          return {
+              type: 'text' as const,
+            text: "I see you have attached a file, This Feature is not available yet."
+        }
     }
 
-    const shouldShowMeme = Math.random() < 0.3;
-    
-    if (shouldShowMeme) {
-      const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
-      return {
-        type: 'image' as const,
-        text: '',
-        image: catMemes[randomMemeIndex]
-      };
+        const shouldShowMeme = Math.random() < 0.3;
+
+        if (shouldShowMeme) {
+            const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
+            return {
+                type: 'image' as const,
+                text: '',
+                image: catMemes[randomMemeIndex]
+            };
+        }
+
+        const responses = data.AI?.answer || [];
+        if (responses.length === 0) {
+            return {
+                type: 'text' as const,
+                text: "I'm not sure how to respond to that."
+            };
+        }
+
+        const randomIndex = Math.floor(Math.random() * responses.length);
+        return {
+            type: 'text' as const,
+            text: responses[randomIndex]
+        };
     }
 
-    const responses = data.AI?.answer || [];
-    if (responses.length === 0) {
-      return {
-        type: 'text' as const,
-        text: "I'm not sure how to respond to that."
-      };
-    }
-    
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    return {
-      type: 'text' as const,
-      text: responses[randomIndex]
-    };
-  }
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+    const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || isThinking) return;
-  
-    const userMessage: Message = { 
-      sender: 'user', 
-      text: message, 
-      type: 'text',
+    if ((!message.trim() && !selectedFile) || isThinking) return; // Allow only message or selectedFile
+
+    const userMessage: Message = {
+      sender: 'user',
+      text: message,
+      type: selectedFile ? 'text' : 'text', // Set type to text for file too (later we can render it differently if needed)
+        file: selectedFile,
       status: 'sent',
       timestamp: new Date()
     };
-  
+
     setConversation([...conversation, userMessage]);
     setMessage('');
+    setSelectedFile(null); // Clear selected file after sending
     setIsThinking(true);
-  
+
     if (!isExpanded) {
       setIsExpanded(true);
     }
-  
-    if (message.includes('@thinklink')) {
-      const taskDescription = message.replace('@thinklink', '').trim();
-      const dueTime = new Date().toLocaleTimeString(); // Example due time
-      setTasks([...tasks, { description: taskDescription, dueTime }]);
-      setThinkLinkTaskDescription(taskDescription);
-      setIsThinking(false);
 
-      const botMessage: Message = { 
-        sender: 'bot',
-        status: 'read',
-        timestamp: new Date(),
-        text: `I will remember to notify you that your task is due at ${dueTime}.`,
-        type: 'text'
-      };
-  
-      setConversation(prev => [
-        ...prev.map((msg, idx) => 
-          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
-        ),
-        botMessage
-      ]);
-      return;
-    }
-  
+     if (message.includes('@thinklink')) {
+            const taskDescription = message.replace('@thinklink', '').trim();
+            const dueTime = new Date().toLocaleTimeString(); // Example due time
+            setTasks([...tasks, { description: taskDescription, dueTime }]);
+            setThinkLinkTaskDescription(taskDescription);
+            setIsThinking(false);
+            const botMessage: Message = {
+                sender: 'bot',
+                status: 'read',
+                timestamp: new Date(),
+                text: `I will remember to notify you that your task is due at ${dueTime}.`,
+                type: 'text'
+            };
+            setConversation(prev => [
+                ...prev.map((msg, idx) =>
+                    idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+                ),
+                botMessage
+            ]);
+            return;
+        }
+
     setTimeout(() => {
-      setConversation(prev => 
-        prev.map((msg, idx) => 
+      setConversation(prev =>
+        prev.map((msg, idx) =>
           idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
         )
       );
     }, 2000);
-  
+
     setTimeout(() => {
-      const botResponse = getRandomResponse(message);
-      const botMessage: Message = { 
+            const botResponse = getRandomResponse(message, selectedFile);
+      const botMessage: Message = {
         sender: 'bot',
         status: 'read',
         timestamp: new Date(),
         text: botResponse.text || '',
         type: botResponse.type,
-        image: botResponse.image
+          image: botResponse.image,
       };
-  
+
       setConversation(prev => [
-        ...prev.map((msg, idx) => 
+        ...prev.map((msg, idx) =>
           idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
         ),
         botMessage
@@ -248,26 +268,66 @@ export default function ChatInput() {
     }, 4000);
   };
 
-  const handleExpand = () => {
-    setIsCollapsed(false)
-    setIsExpanded(true)
-  }
-
   const handleAttach = () => {
-    alert('Attach button clicked')
-  }
+        setIsAttachOpen(!isAttachOpen);
+    };
 
   const handleGlobe = () => {
-    alert('Globe button clicked')
-  }
+      // Example: Open a new tab with a default search engine
+     window.open('https://www.google.com', '_blank');
+  };
 
   const handleGear = () => {
-    alert('Gear button clicked')
-  }
+      setIsSettingsOpen(!isSettingsOpen);
+  };
 
-  const handleMicrophone = () => {
-    alert('Microphone button clicked')
-  }
+    const handleMicrophone = async () => {
+        if (isRecording) {
+            if (mediaRecorder) {
+                 mediaRecorder.stop();
+             }
+            setIsRecording(false);
+
+            return;
+        }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+           const recorder = new MediaRecorder(stream);
+            setMediaRecorder(recorder);
+            recorder.ondataavailable = (event) => {
+                if(event.data.size > 0) {
+                    setAudioChunks((prevChunks) => [...prevChunks, event.data])
+                }
+            };
+            recorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+               setAudioChunks([]);
+
+                 const audioUrl = URL.createObjectURL(audioBlob);
+                  const botMessage: Message = {
+                      sender: 'bot',
+                      status: 'read',
+                      timestamp: new Date(),
+                      text: `[Audio Message]`,
+                      type: 'text'
+                  }
+
+                   setConversation((prev) => [
+                        ...prev,
+                        botMessage,
+                   ]);
+
+               const audioElement = new Audio(audioUrl);
+                audioElement.play()
+            }
+        recorder.start();
+        setIsRecording(true);
+    } catch(error) {
+    console.error("Error accessing microphone", error);
+    }
+  };
+
+
 
   const toggleExpand = () => {
     const newExpandedState = !isExpanded
@@ -291,9 +351,26 @@ export default function ChatInput() {
     setIsModalOpen(false);
   }
 
+    const handleCloseAttachMenu = () => {
+        setIsAttachOpen(false);
+    };
+    const handleCloseSettingsMenu = () => {
+        setIsSettingsOpen(false);
+    };
+
+    const handleFileAttach = (file: File) => {
+        setSelectedFile(file)
+        handleCloseAttachMenu();
+    };
+
+    const handleSettingAction = (action:string) => {
+          alert(`clicked ${action} button in settings`)
+          handleCloseSettingsMenu();
+    }
+
   if (isCollapsed && !isExpanded) {
     return (
-      <motion.div 
+      <motion.div
         className="fixed bottom-4 right-4"
         initial={{ opacity: 0, scale: 0.5, x: '100%' }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -305,7 +382,7 @@ export default function ChatInput() {
         }}
       >
         <motion.button
-          onClick={handleExpand}
+          onClick={() => setIsExpanded(true)}
           className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -318,7 +395,7 @@ export default function ChatInput() {
 
   return (
     <>
-      <motion.div 
+      <motion.div
         className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4"
         onMouseEnter={handleInteraction}
         initial={{ y: 100, opacity: 0 }}
@@ -330,12 +407,12 @@ export default function ChatInput() {
           damping: 25
         }}
       >
-        <motion.div 
+        <motion.div
           className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
           initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
-          animate={{ 
-            boxShadow: conversation.length > 0 || isThinking 
-              ? "0 0 20px rgba(255,255,255,0.1)" 
+          animate={{
+            boxShadow: conversation.length > 0 || isThinking
+              ? "0 0 20px rgba(255,255,255,0.1)"
               : "0 0 0 rgba(255,255,255,0)"
           }}
           transition={{ duration: 0.3 }}
@@ -347,7 +424,7 @@ export default function ChatInput() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ 
+                  transition={{
                     type: "spring",
                     stiffness: 200,
                     damping: 20
@@ -356,23 +433,23 @@ export default function ChatInput() {
                 >
                   <div className="h-[400px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {conversation.map((msg, idx) => (
-                      <motion.div 
+                      <motion.div
                         key={idx}
                         className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} mb-4`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div 
+                        <div
                           className={`rounded-2xl px-4 py-2 max-w-[70%] ${
-                            msg.sender === 'user' 
-                              ? 'bg-blue-500/80 text-white' 
+                            msg.sender === 'user'
+                              ? 'bg-blue-500/80 text-white'
                               : 'bg-white/10 text-white'
                           }`}
                         >
                           {msg.type === 'image' ? (
-                            <motion.img 
-                              src={msg.image} 
+                            <motion.img
+                              src={msg.image}
                               alt="Cat Meme"
                               className="max-w-[200px] rounded-lg"
                               initial={{ scale: 0.8, opacity: 0 }}
@@ -386,7 +463,12 @@ export default function ChatInput() {
                               filter={true}
                               duration={0.5}
                             />
-                          ) : (
+                           ) :  msg.file ? (
+
+                            <span className="text-sm">
+                                Attached File: {msg.file.name}
+                            </span>
+                           ) : (
                             <span className="text-sm">{msg.text}</span>
                           )}
                         </div>
@@ -397,9 +479,9 @@ export default function ChatInput() {
                         )}
                       </motion.div>
                     ))}
-                    
+
                     {isThinking && (
-                      <motion.div 
+                      <motion.div
                         className="flex gap-2 items-center p-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -427,26 +509,93 @@ export default function ChatInput() {
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-2 p-4 bg-transparent">
-              <motion.div 
+            <div className="flex items-center gap-2 p-4 bg-transparent relative">
+              <motion.div
                 className="flex items-center gap-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors" onClick={handleAttach}>
-                  <Plus className="h-5 w-5" />
-                  <span className="text-sm text-white/60">Attach</span>
-                </button>
+                 <button
+                        type="button"
+                        className="relative"
+                        onClick={handleAttach}
+                    >
+                        <div className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+                            <Plus className="h-5 w-5" />
+                            <span className="text-sm text-white/60">Attach</span>
+                        </div>
+
+                        {isAttachOpen && (
+                            <motion.div
+                                className="absolute bottom-12 left-0 bg-black border border-white/20 rounded-lg p-2 z-50"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                            >
+                                <div className="flex flex-col">
+                                    <input
+                                        type="file"
+                                        id="file-upload"
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => {
+                                            if (e.target.files) {
+                                                handleFileAttach(e.target.files[0])
+                                            }
+                                        }}
+                                    />
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-lg"
+                                    >
+                                        Attach File
+                                    </label>
+                                    <button
+                                        onClick={handleCloseAttachMenu}
+                                        className="hover:bg-white/10 px-4 py-2 rounded-lg"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </button>
+
                 <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGlobe}>
                   <Globe className="h-5 w-5" />
                 </button>
-                <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGear}>
-                  <Gear className="h-5 w-5" />
+                <button type="button" className="relative" onClick={handleGear}>
+                         <div className="p-1 text-white/80 hover:text-white transition-colors">
+                           <Gear className="h-5 w-5" />
+                         </div>
+                        {isSettingsOpen && (
+                                    <motion.div
+                                    className="absolute bottom-12 right-0 bg-black border border-white/20 rounded-lg p-2 z-50"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                    >
+                                        <div className="flex flex-col">
+                                            <button onClick={handleCloseSettingsMenu} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                Close
+                                            </button>
+                                            <button onClick={()=> handleSettingAction("settings")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                Settings
+                                            </button>
+                                            <button onClick={()=> handleSettingAction("privacy")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                Privacy
+                                            </button>
+                                            <button onClick={()=> handleSettingAction("security")}  className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                 Security
+                                            </button>
+
+                                        </div>
+                                    </motion.div>
+                        )}
                 </button>
               </motion.div>
-              
-              <input 
+
+              <input
                 type="text"
                 value={message}
                 onChange={(e) => {
@@ -458,32 +607,32 @@ export default function ChatInput() {
                 placeholder="Message to Mazs AI "
                 className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-white/40 min-w-0"
               />
-              
-              <motion.div 
+
+              <motion.div
                 className="flex gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleMicrophone}>
-                  <Microphone className="h-5 w-5" />
-                </button>
-                <button 
-                  type="submit" 
+                <button type="button" className={`p-1 text-white/80 hover:text-white transition-colors ${isRecording ? 'text-red-500' : ''}`} onClick={handleMicrophone}>
+                    <Microphone className="h-5 w-5" />
+                  </button>
+                <button
+                  type="submit"
                   className="p-1 text-white/80 hover:text-white transition-colors"
                   disabled={isThinking}
                 >
                   <Circles5Random className="h-5 w-5" />
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="p-1 text-white/80 hover:text-white transition-colors"
                   onClick={toggleExpand}
                 >
                   {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="p-1 text-white/80 hover:text-white transition-colors"
                   onClick={handleShowTasks}
                 >
@@ -500,8 +649,8 @@ export default function ChatInput() {
           <div className="bg-black text-white border border-white p-4 rounded-lg max-w-lg w-full">
             <h2 className="text-xl mb-4">Tasks</h2>
             <pre className="whitespace-pre-wrap">{JSON.stringify(tasks, null, 2)}</pre>
-            <button 
-              onClick={closeModal} 
+            <button
+              onClick={closeModal}
               className="mt-4 bg-white text-black px-4 py-2 rounded"
             >
               Close

@@ -6,6 +6,7 @@ import AboutUs from "../src/components/UI/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/UI/onlineTools"
+import News from "./components/UI/News";
 function App() {
   return (
     <div className="App">
@@ -17,6 +18,7 @@ function App() {
           <Route path="/preview" element={<Preview />} />
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
+          <Route path="/news" element={<News />} />
         </Routes>
       </div>
 
