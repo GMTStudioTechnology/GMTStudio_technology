@@ -9,6 +9,7 @@ import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
 import Meme4 from "../../assets/Meme_3.png"
 
+import List from "../Cool_item/List"
 const TextGenerateEffect = ({
   words,
   className,
@@ -35,7 +36,7 @@ const TextGenerateEffect = ({
         delay: stagger(0.2),
       }
     );
-  }, [animate, duration, filter]);
+  }, [animate, duration, filter, scope.current]);
 
   return (
     <div className={`font-normal ${className || ''}`}>
@@ -61,17 +62,18 @@ const TextGenerateEffect = ({
 interface Message {
   sender: string;
   text: string;
-  type?: 'text' | 'image';
+  type?: 'text' | 'image' | 'list';
   image?: string;
   status: 'sent' | 'delivered' | 'read';
   timestamp: Date;
 }
 
+
 const DIRECT_RESPONSES: Record<string, string> = {
   'hello': 'Hello! How can I help you?',
   'hi': 'hai ya! How can I help you?',
   'hey': 'yallow! How can I help you?',
-  'hola': 'Hola! ¿En qué puedo ayudarte?',
+  '': 'Hola! ¿En puedo ayudarte?',
   'ciao': 'Ciao! Come posso aiutarti?'
 };
 
@@ -81,6 +83,7 @@ export default function ChatInput() {
   const [isThinking, setIsThinking] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [, setThinkLinkTaskDescription] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const lastInteractionRef = useRef<number>(Date.now())
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -168,35 +171,57 @@ export default function ChatInput() {
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!message.trim() || isThinking) return
-
+    e.preventDefault();
+    if (!message.trim() || isThinking) return;
+  
     const userMessage: Message = { 
       sender: 'user', 
       text: message, 
       type: 'text',
       status: 'sent',
       timestamp: new Date()
-    }
-    
-    setConversation([...conversation, userMessage])
-    setMessage('')
-    setIsThinking(true)
-    
+    };
+  
+    setConversation([...conversation, userMessage]);
+    setMessage('');
+    setIsThinking(true);
+  
     if (!isExpanded) {
-      setIsExpanded(true)
+      setIsExpanded(true);
     }
+  
+    if (message.includes('@thinklink')) {
+      const taskDescription = message.replace('@thinklink', '').trim();
+      setThinkLinkTaskDescription(taskDescription);
+      setIsThinking(false);
 
+      const botMessage: Message = { 
+        sender: 'bot',
+        status: 'read',
+        timestamp: new Date(),
+        text: '',
+        type: 'list'
+      };
+  
+      setConversation(prev => [
+        ...prev.map((msg, idx) => 
+          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+        ),
+        botMessage
+      ]);
+      return;
+    }
+  
     setTimeout(() => {
       setConversation(prev => 
         prev.map((msg, idx) => 
           idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
         )
-      )
-    }, 2000)
-
+      );
+    }, 2000);
+  
     setTimeout(() => {
-      const botResponse = getRandomResponse(message)
+      const botResponse = getRandomResponse(message);
       const botMessage: Message = { 
         sender: 'bot',
         status: 'read',
@@ -204,17 +229,17 @@ export default function ChatInput() {
         text: botResponse.text || '',
         type: botResponse.type,
         image: botResponse.image
-      }
-      
+      };
+  
       setConversation(prev => [
         ...prev.map((msg, idx) => 
           idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
         ),
         botMessage
-      ])
-      setIsThinking(false)
-    }, 4000)
-  }
+      ]);
+      setIsThinking(false);
+    }, 4000);
+  };
 
   const handleExpand = () => {
     setIsCollapsed(false)
@@ -338,6 +363,8 @@ export default function ChatInput() {
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.3 }}
                           />
+                        ) : msg.type === 'list' ? (
+                          <List />
                         ) : msg.sender === 'bot' ? (
                           <TextGenerateEffect
                             words={msg.text}

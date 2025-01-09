@@ -1,18 +1,17 @@
+
+
 'use client'
 
-import { useState, useEffect } from "react";
-import SimpleNeuralNetwork from './Neural'; // Import the neural network
-
-import { AnimatePresence, LayoutGroup, Reorder, motion, stagger, useAnimate } from "framer-motion";
-import { Plus, ClockArrowRotateLeft, Gear, TrashBin } from "@gravity-ui/icons";
-import { BsStars } from "react-icons/bs";
-import { IoSparkles } from "react-icons/io5";
-import { useIdleTimer } from 'react-idle-timer';
-
-// Utility function for conditional class names
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
-}
+import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown, Keyboard } from '@gravity-ui/icons'
+import data from './data.json'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
+import Meme1 from "../../assets/Meme.png"
+import Meme2 from "../../assets/Meme_1.png"
+import Meme3 from "../../assets/Meme_2.png"
+import Meme4 from "../../assets/Meme_3.png"
+import { addThinkLinkTask } from './TaskUtils';
+import List from './List'; // Import List component
 
 const TextGenerateEffect = ({
   words,
@@ -26,7 +25,7 @@ const TextGenerateEffect = ({
   duration?: number;
 }) => {
   const [scope, animate] = useAnimate();
-const wordsArray = words.split(" ");
+  const wordsArray = words.split(" ");
 
   useEffect(() => {
     animate(
@@ -36,387 +35,390 @@ const wordsArray = words.split(" ");
         filter: filter ? "blur(0px)" : "none",
       },
       {
-        duration: duration ? duration : 1,
+        duration: duration,
         delay: stagger(0.2),
       }
     );
   }, [animate, duration, filter, scope.current]);
 
   return (
-    <div className={cn("font-bold", className)}>
-      <div className="mt-4">
-        <div className="text-white text-2xl leading-snug tracking-wide">
-          <motion.div ref={scope}>
-            {wordsArray.map((word, idx) => (
-              <motion.span
-                key={word + idx}
-                className="opacity-0"
-                style={{
-                  filter: filter ? "blur(10px)" : "none",
-                }}
-              >
-                {word}{" "}
-              </motion.span>
-            ))}
-          </motion.div>
-        </div>
-      </div>
+    <div className={`font-normal ${className || ''}`}>
+      <motion.div ref={scope}>
+        {wordsArray.map((word, idx) => (
+          <motion.span
+            key={word + idx}
+            className="text-white opacity-0"
+            style={{
+              filter: filter ? "blur(10px)" : "none",
+              display: "inline-block",
+              marginRight: "4px"
+            }}
+          >
+            {word}
+          </motion.span>
+        ))}
+      </motion.div>
     </div>
   );
 };
 
-const AIThinkingAnimation = () => (
-  <div className="flex items-center space-x-2 mb-4">
-    <motion.div
-      className="w-3 h-3 bg-blue-500 rounded-full"
-      animate={{
-        scale: [1, 1.2, 1],
-        opacity: [1, 0.5, 1],
-      }}
-      transition={{
-        duration: 1,
-        repeat: Infinity,
-        delay: 0,
-      }}
-    />
-    <motion.div
-      className="w-3 h-3 bg-blue-500 rounded-full"
-      animate={{
-        scale: [1, 1.2, 1],
-        opacity: [1, 0.5, 1],
-      }}
-      transition={{
-        duration: 1,
-        repeat: Infinity,
-        delay: 0.2,
-      }}
-    />
-    <motion.div
-      className="w-3 h-3 bg-blue-500 rounded-full"
-      animate={{
-        scale: [1, 1.2, 1],
-        opacity: [1, 0.5, 1],
-      }}
-      transition={{
-        duration: 1,
-        repeat: Infinity,
-        delay: 0.4,
-      }}
-    />
-  </div>
-);
-
-interface WorkflowItem {
-  id: number;
+interface Message {
+  sender: string;
   text: string;
-  checked: boolean;
-  priority: 'low' | 'medium' | 'high';
-  dueDate?: string;
+  type?: 'text' | 'image';
+  image?: string;
+  status: 'sent' | 'delivered' | 'read';
+  timestamp: Date;
 }
 
-export default function AgentWorkflow() {
-  const [items, setItems] = useState<WorkflowItem[]>([
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [inputText, setInputText] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processedText, setProcessedText] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState<'low' | 'medium' | 'high'>('medium');
-  const [dueDate, setDueDate] = useState("");
-  const [showCompleted, setShowCompleted] = useState(true);
-  const [isMinimized, setIsMinimized] = useState(false);
+const DIRECT_RESPONSES: Record<string, string> = {
+  'hello': 'Hello! How can I help you?',
+  'hi': 'hai ya! How can I help you?',
+  'hey': 'yallow! How can I help you?',
+  '': 'Hola! ¿En qué puedo ayudarte?',
+  'ciao': 'Ciao! Come posso aiutarti?'
+};
 
-  const handleOnIdle = () => {
-    if (!isModalOpen) {
-      setIsMinimized(true);
+export default function ChatInput() {
+  const [message, setMessage] = useState<string>('')
+  const [conversation, setConversation] = useState<Message[]>([])
+  const [isThinking, setIsThinking] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isThinkLinkOpen, setIsThinkLinkOpen] = useState(false)
+  const [thinkLinkTaskDescription, setThinkLinkTaskDescription] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const lastInteractionRef = useRef<number>(Date.now())
+  const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isExpandedRef = useRef(isExpanded)
+
+  const catMemes = [Meme1, Meme3, Meme2, Meme4];
+
+  useEffect(() => {
+    isExpandedRef.current = isExpanded
+  }, [isExpanded])
+
+  const resetCollapseTimeout = useCallback(() => {
+    if (!isExpandedRef.current) {
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current)
+      }
+      lastInteractionRef.current = Date.now()
+      setIsCollapsed(false)
+
+      collapseTimeoutRef.current = setTimeout(() => {
+        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 3000) {
+          setIsCollapsed(true)
+        }
+      }, 3000)
     }
-  }
+  }, [])
 
-  const { reset } = useIdleTimer({
-    timeout: 1000,
-    onIdle: handleOnIdle,
-    debounce: 500
-  })
+  useEffect(() => {
+    resetCollapseTimeout()
+    return () => {
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current)
+      }
+    }
+  }, [resetCollapseTimeout])
 
   const handleInteraction = () => {
-    if (isMinimized) {
-      setIsMinimized(false);
+    if (!isExpanded) {
+      resetCollapseTimeout()
     }
-    reset();
   }
 
-  const handleCheck = (id: number) => {
-    setItems(items.map(item =>
-      item.id === id ? { ...item, checked: !item.checked } : item
-    ));
-    reset();
-  };
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
-  const handleRefresh = () => {
-    setItems(items.map(item => ({ ...item, checked: false })));
-    reset();
-  };
+  useEffect(() => {
+    scrollToBottom()
+  }, [conversation, isThinking])
 
-  const handleProcessInput = () => {
-    if (!inputText) return; // Ensure inputText is not empty
-    setIsProcessing(true);
-    setTimeout(() => {
-      setProcessedText(SimpleNeuralNetwork.summarize(inputText)); // Use the neural network to summarize
-      setIsProcessing(false);
-    }, 2000);
-    reset();
-  };
-
-  const handleAddTask = () => {
-    if (!processedText && !inputText) return;
-
-    const newId = Math.max(...items.map(item => item.id), 0) + 1;
-    setItems([...items, {
-      id: newId,
-      text: processedText || inputText,
-      checked: false,
-      priority: selectedPriority,
-      dueDate: dueDate || undefined
-    }]);
-    setIsModalOpen(false);
-    resetModal();
-    reset();
-  };
-
-  const resetModal = () => {
-    setInputText("");
-    setProcessedText("");
-    setSelectedPriority('medium');
-    setDueDate("");
-  };
-
-  const deleteTask = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
-    reset();
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch(priority) {
-      case 'high': return 'text-red-500';
-      case 'medium': return 'text-yellow-500';
-      case 'low': return 'text-green-500';
-      default: return 'text-gray-500';
+  const getRandomResponse = (userMessage: string) => {
+    const lowercaseMessage = userMessage.toLowerCase().trim();
+    
+    if (DIRECT_RESPONSES[lowercaseMessage]) {
+      return {
+        type: 'text' as const,
+        text: DIRECT_RESPONSES[lowercaseMessage]
+      };
     }
+
+    const shouldShowMeme = Math.random() < 0.3;
+    
+    if (shouldShowMeme) {
+      const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
+      return {
+        type: 'image' as const,
+        text: '',
+        image: catMemes[randomMemeIndex]
+      };
+    }
+
+    const responses = data.AI?.answer || [];
+    if (responses.length === 0) {
+      return {
+        type: 'text' as const,
+        text: "I'm not sure how to respond to that."
+      };
+    }
+    
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    return {
+      type: 'text' as const,
+      text: responses[randomIndex]
+    };
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || isThinking) return;
+  
+    const userMessage: Message = { 
+      sender: 'user', 
+      text: message, 
+      type: 'text',
+      status: 'sent',
+      timestamp: new Date()
+    };
+  
+    setConversation([...conversation, userMessage]);
+    setMessage('');
+    setIsThinking(true);
+  
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+  
+    if (message.includes('@thinklink')) {
+      const taskDescription = message.replace('@thinklink', '').trim();
+      setThinkLinkTaskDescription(taskDescription);
+      setIsThinkLinkOpen(true);
+      setIsThinking(false);
+      return;
+    }
+  
+    setTimeout(() => {
+      setConversation(prev => 
+        prev.map((msg, idx) => 
+          idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
+        )
+      );
+    }, 2000);
+  
+    setTimeout(() => {
+      const botResponse = getRandomResponse(message);
+      const botMessage: Message = { 
+        sender: 'bot',
+        status: 'read',
+        timestamp: new Date(),
+        text: botResponse.text || '',
+        type: botResponse.type,
+        image: botResponse.image
+      };
+  
+      setConversation(prev => [
+        ...prev.map((msg, idx) => 
+          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+        ),
+        botMessage
+      ]);
+      setIsThinking(false);
+    }, 4000);
   };
 
-  const filteredItems = showCompleted ? items : items.filter(item => !item.checked);
+  const handleExpand = () => {
+    setIsCollapsed(false)
+    setIsExpanded(true)
+  }
 
-  return (
-    <motion.div
-      className="fixed bottom-4 left-4 z-50"
-      animate={{
-width: isMinimized ? 'min(200px, calc(100vw - 2rem))' : 'auto',
-        height: isMinimized ? 'auto' : 'auto'
-      }}
-      onClick={handleInteraction}
-    >
-      <motion.div
-        className={`bg-black text-white border border-white/20 rounded-3xl shadow-xl overflow-hidden`}
-        animate={{
-          padding: isMinimized ? '0.75rem' : '1.5rem'
+  const handleAttach = () => {
+    alert('Attach button clicked')
+  }
+
+  const handleGlobe = () => {
+    alert('Globe button clicked')
+  }
+
+  const handleGear = () => {
+    alert('Gear button clicked')
+  }
+
+  const handleMicrophone = () => {
+    alert('Microphone button clicked')
+  }
+
+  const toggleExpand = () => {
+    const newExpandedState = !isExpanded
+    setIsExpanded(newExpandedState)
+    if (!newExpandedState) {
+      resetCollapseTimeout()
+    }
+  }
+
+  const MessageStatus = ({ status }: { status: Message['status'] }) => {
+    if (status === 'sent') return <span className="text-xs text-gray-400">Sent</span>
+    if (status === 'delivered') return <span className="text-xs text-gray-400">Delivered</span>
+    return <span className="text-xs text-blue-400">Read</span>
+  }
+
+  const handleThinkLinkSubmit = () => {
+    if (!thinkLinkTaskDescription.trim()) return;
+    addThinkLinkTask(thinkLinkTaskDescription);
+    setIsThinkLinkOpen(false);
+    setThinkLinkTaskDescription('');
+  }
+
+  if (isCollapsed && !isExpanded) {
+    return (
+      <motion.div 
+        className="fixed bottom-4 right-4"
+        initial={{ opacity: 0, scale: 0.5, x: '100%' }}
+        animate={{ opacity: 1, scale: 1, x: 0 }}
+        exit={{ opacity: 0, scale: 0.5, x: '100%' }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25
         }}
       >
-        <AnimatePresence>
-          {!isMinimized && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center mb-6"
-            >
-              <div className="mr-4 bg-white/10 p-3 rounded-xl">
-                <IoSparkles className="w-6 h-6 text-blue-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold">Think Link</h2>
-                <p className="text-sm text-gray-400">Powered by @ MazsAI - ThinkLink v1.0</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.button
+          onClick={handleExpand}
+          className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Keyboard className="h-6 w-6" />
+        </motion.button>
+      </motion.div>
+    )
+  }
 
-        <AnimatePresence>
-          {!isMinimized && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div className="flex justify-between mb-6">
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white/5 rounded-xl hover:bg-white/10 transition-all"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span>New Task</span>
-                </button>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowCompleted(!showCompleted)}
-                    className={`px-4 py-2 rounded-xl transition-all ${showCompleted ? 'bg-white/10' : 'bg-white/5'}`}
-                  >
-                    {showCompleted ? 'Hide' : 'Show'} Completed
-                  </button>
-                  <button
-                    onClick={handleRefresh}
-                    className="px-4 py-2 bg-white/5 rounded-xl hover:bg-white/10 transition-all"
-                  >
-                    <ClockArrowRotateLeft className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              <LayoutGroup>
-                <Reorder.Group axis="y" values={filteredItems} onReorder={setItems} className="space-y-3">
-                  <AnimatePresence>
-                    {filteredItems.map((item, index) => (
-                      <Reorder.Item key={item.id} value={item} className="list-none">
-                        <motion.div
-                          className="flex items-center justify-between bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-all"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <div className="flex items-center space-x-4 flex-1">
-                            <input
-                              type="checkbox"
-                              checked={item.checked}
-                              onChange={() => handleCheck(item.id)}
-                              className="form-checkbox h-5 w-5 text-blue-600 rounded-lg bg-white/5 border-white/20"
-                            />
-                            <span className="text-lg font-medium text-gray-400">{index + 1}</span>
-                            <div className="flex flex-col">
-                              <span className={`${item.checked ? 'line-through text-gray-500' : ''}`}>
-                                {item.text}
-                              </span>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <span className={`text-sm ${getPriorityColor(item.priority)}`}>
-                                  {item.priority}
-                                </span>
-                                {item.dueDate && (
-                                  <span className="text-sm text-gray-400">
-                                    Due: {new Date(item.dueDate).toLocaleDateString()}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => deleteTask(item.id)}
-                              className="text-gray-400 hover:text-red-500 transition-colors p-2"
-                            >
-                              <TrashBin className="w-5 h-5" />
-                            </button>
-                            <button className="text-gray-400 hover:text-white transition-colors p-2">
-                              <Gear className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </motion.div>
-                      </Reorder.Item>
-                    ))}
-                  </AnimatePresence>
-                </Reorder.Group>
-              </LayoutGroup>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {isMinimized && (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center space-x-2"
-          >
-            <IoSparkles className="w-6 h-6 text-blue-400" />
-            <span className="text-sm font-medium">{items.length} tasks</span>
-          </motion.div>
-        )}
-
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-black border border-white/20 p-6 rounded-2xl w-[90%] max-w-md shadow-2xl"
-            >
-              <h3 className="text-xl font-semibold mb-4">Create New Task</h3>
-              <div className="relative mb-4">
-                {isProcessing && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <AIThinkingAnimation />
-                  </div>
-                )}
-                {processedText && (
-                  <TextGenerateEffect
-                    words={processedText}
-                    className="mb-4"
-                    duration={0.8}
-                  />
-                )}
-                {!isProcessing && !processedText && (
-                  <input
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    className="w-full bg-white/5 text-white p-4 rounded-xl mb-4 border border-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-                    placeholder="Enter task description..."
-                  />
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Priority</label>
-                  <select
-                    value={selectedPriority}
-                    onChange={(e) => setSelectedPriority(e.target.value as 'low' | 'medium' | 'high')}
-                    className="w-full bg-white/5 text-white p-3 rounded-xl border border-white/10"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Due Date</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-white/5 text-white p-3 rounded-xl border border-white/10"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center">
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  resetModal();
+  return (
+    <motion.div 
+      className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4"
+      onMouseEnter={handleInteraction}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 25
+      }}
+    >
+      <motion.div 
+        className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
+        initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
+        animate={{ 
+          boxShadow: conversation.length > 0 || isThinking 
+            ? "0 0 20px rgba(255,255,255,0.1)" 
+            : "0 0 0 rgba(255,255,255,0)"
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <AnimatePresence mode="wait">
+            {isExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20
                 }}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                className="border-b border-white/10"
               >
-                Cancel
-              </button>
-              <div className="flex space-x-3">
-                {!processedText && (
-                  <button
-                    onClick={handleProcessInput}
-                    className="px-4 py-2 bg-blue-600 rounded-xl hover:bg-blue-500 transition-all flex items-center space-x-2"
-                  >
-                    <BsStars className="w-5 h-5" />
-                    <span>AI Suggest</span>
-                  </button>
-                )}
+                <div className="h-[400px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  {conversation.map((msg, idx) => (
+                    <motion.div 
+                      key={idx}
+                      className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} mb-4`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div 
+                        className={`rounded-2xl px-4 py-2 max-w-[70%] ${
+                          msg.sender === 'user' 
+                            ? 'bg-blue-500/80 text-white' 
+                            : 'bg-white/10 text-white'
+                        }`}
+                      >
+                        {msg.type === 'image' ? (
+                          <motion.img 
+                            src={msg.image} 
+                            alt="Cat Meme"
+                            className="max-w-[200px] rounded-lg"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        ) : msg.sender === 'bot' ? (
+                          <TextGenerateEffect
+                            words={msg.text}
+                            className="text-sm"
+                            filter={true}
+                            duration={0.5}
+                          />
+                        ) : (
+                          <span className="text-sm">{msg.text}</span>
+                        )}
+                      </div>
+                      {msg.sender === 'user' && (
+                        <div className="mt-1">
+                          <MessageStatus status={msg.status} />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                  
+                  {isThinking && (
+                    <motion.div 
+                      className="flex gap-2 items-center p-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            className="w-2 h-2 bg-gray-400 rounded-full"
+                            animate={{ y: ["0%", "-50%", "0%"] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: i * 0.2,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {isThinkLinkOpen && (
+            <div className="p-4 border-t border-white/10">
+              <List />
+              <div className="flex justify-between items-center mt-4">
                 <button
-                  onClick={handleAddTask}
+                  onClick={() => setIsThinkLinkOpen(false)}
+                  className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleThinkLinkSubmit}
                   className="px-6 py-2 bg-white text-black rounded-xl hover:bg-gray-100 transition-all flex items-center space-x-2"
                 >
                   <Plus className="w-5 h-5" />
@@ -424,10 +426,67 @@ width: isMinimized ? 'min(200px, calc(100vw - 2rem))' : 'auto',
                 </button>
               </div>
             </div>
-          </motion.div>
-        </div>
-      )}
+          )}
+
+          <div className="flex items-center gap-2 p-4 bg-transparent">
+            <motion.div 
+              className="flex items-center gap-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <button type="button" className="flex items-center gap-2 text-white/80 hover:text-white transition-colors" onClick={handleAttach}>
+                <Plus className="h-5 w-5" />
+                <span className="text-sm text-white/60">Attach</span>
+              </button>
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGlobe}>
+                <Globe className="h-5 w-5" />
+              </button>
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGear}>
+                <Gear className="h-5 w-5" />
+              </button>
+            </motion.div>
+            
+            <input 
+              type="text"
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                if (!isExpanded) {
+                  resetCollapseTimeout()
+                }
+              }}
+              placeholder="Message to Mazs AI "
+              className="flex-1 bg-transparent border-0 focus:outline-none text-white placeholder:text-white/40 min-w-0"
+            />
+            
+            <motion.div 
+              className="flex gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleMicrophone}>
+                <Microphone className="h-5 w-5" />
+              </button>
+              <button 
+                type="submit" 
+                className="p-1 text-white/80 hover:text-white transition-colors"
+                disabled={isThinking}
+              >
+                <Circles5Random className="h-5 w-5" />
+              </button>
+              <button 
+                type="button" 
+                className="p-1 text-white/80 hover:text-white transition-colors"
+                onClick={toggleExpand}
+              >
+                {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+              </button>
+            </motion.div>
+          </div>
+        </form>
+      </motion.div>
     </motion.div>
-    </motion.div>
-  );
+  )
 }
