@@ -6,7 +6,6 @@ import AboutUs from "../src/components/UI/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/UI/onlineTools"
-import List from "./components/UI/Cool_item/List"
 function App() {
   return (
     <div className="App">
@@ -22,7 +21,6 @@ function App() {
       </div>
 
     </Router>
-    <List/>
     <Input/>
     </div>
   );

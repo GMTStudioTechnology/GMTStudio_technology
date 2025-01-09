@@ -101,10 +101,10 @@ export default function ChatInput() {
       setIsCollapsed(false)
 
       collapseTimeoutRef.current = setTimeout(() => {
-        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 1000) {
+        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 3000) {
           setIsCollapsed(true)
         }
-      }, 1000)
+      }, 3000)
     }
   }, [])
 
@@ -193,7 +193,7 @@ export default function ChatInput() {
           idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
         )
       )
-    }, 1000)
+    }, 2000)
 
     setTimeout(() => {
       const botResponse = getRandomResponse(message)
@@ -213,7 +213,7 @@ export default function ChatInput() {
         botMessage
       ])
       setIsThinking(false)
-    }, 2000)
+    }, 4000)
   }
 
   const handleExpand = () => {
