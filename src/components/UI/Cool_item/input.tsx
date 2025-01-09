@@ -67,6 +67,14 @@ interface Message {
   timestamp: Date;
 }
 
+const DIRECT_RESPONSES: Record<string, string> = {
+  'hello': 'Hello! How can I help you?',
+  'hi': 'hai ya! How can I help you?',
+  'hey': 'yallow! How can I help you?',
+  'hola': 'Hola! ¿En qué puedo ayudarte?',
+  'ciao': 'Ciao! Come posso aiutarti?'
+};
+
 export default function ChatInput() {
   const [message, setMessage] = useState<string>('')
   const [conversation, setConversation] = useState<Message[]>([])
@@ -80,7 +88,6 @@ export default function ChatInput() {
 
   const catMemes = [Meme1, Meme3, Meme2, Meme4];
 
-  // Update ref when isExpanded changes
   useEffect(() => {
     isExpandedRef.current = isExpanded
   }, [isExpanded])
@@ -124,7 +131,18 @@ export default function ChatInput() {
     scrollToBottom()
   }, [conversation, isThinking])
 
-  const getRandomResponse = () => {
+  const getRandomResponse = (userMessage: string) => {
+    const lowercaseMessage = userMessage.toLowerCase().trim();
+    
+    // Check for direct greetings
+    if (DIRECT_RESPONSES[lowercaseMessage]) {
+      return {
+        type: 'text' as const,
+        text: DIRECT_RESPONSES[lowercaseMessage]
+      };
+    }
+
+    // Default random response behavior
     const shouldShowMeme = Math.random() < 0.3;
     
     if (shouldShowMeme) {
@@ -171,7 +189,6 @@ export default function ChatInput() {
       setIsExpanded(true)
     }
 
-    // Simulate message status updates
     setTimeout(() => {
       setConversation(prev => 
         prev.map((msg, idx) => 
@@ -181,7 +198,7 @@ export default function ChatInput() {
     }, 1000)
 
     setTimeout(() => {
-      const botResponse = getRandomResponse()
+      const botResponse = getRandomResponse(message)
       const botMessage: Message = { 
         sender: 'bot',
         status: 'read',

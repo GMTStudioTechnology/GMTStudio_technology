@@ -13,7 +13,6 @@ const MainPage: React.FC = () => {
         </div>
         <Intro text="Experience well enhanced tools at GMTStudio" />
       <Testimonial />
-
     </div>
 
   );

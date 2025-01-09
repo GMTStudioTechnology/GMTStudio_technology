@@ -4,6 +4,7 @@ import MazsAI from "../assets/MazsAI.png";
 import ThinkLink from "../assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
 import Video from "../assets/A.mov";
+import Video2 from "../assets/B.mov"
 
 interface ProjectSectionProps {
   title: string;
@@ -197,6 +198,7 @@ const Projects = () => {
       textColor: "black",
       category: "Productivity",
       features: ["Real-time Sync", "Smart Workflows", "Team Analytics"],
+      video:Video2
     }
   ];
 
