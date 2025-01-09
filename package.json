@@ -23,6 +23,7 @@
     "react-icon": "^1.0.0",
     "react-icons": "^5.4.0",
     "react-idle-timer": "^5.7.2",
+    "react-masonry-css": "^1.0.16",
     "react-router-dom": "^7.1.1",
     "react-use-measure": "^2.1.1",
     "styled-components": "^6.1.13",
