@@ -5,7 +5,8 @@ import {
   House,
   CircleInfo,
   Server,
-  Envelope
+  Envelope,
+  Picture
 } from '@gravity-ui/icons';
 import GMTLogo from "../assets/Gicon.png"
 const Navbar: React.FC = () => {
@@ -18,6 +19,7 @@ const Navbar: React.FC = () => {
     { name: "about us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
+    { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
   ];
 
   // Handle navbar background on scroll
@@ -79,7 +81,7 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex md:items-center">
             <motion.div 
               className="relative"
-              animate={{ width: searchFocused ? 600 : 300 }}
+              animate={{ width: searchFocused ? 525 : 300 }}
               transition={{ duration: 0.3 }}
             >
               <input
