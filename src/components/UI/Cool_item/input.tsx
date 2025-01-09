@@ -101,10 +101,10 @@ export default function ChatInput() {
       setIsCollapsed(false)
 
       collapseTimeoutRef.current = setTimeout(() => {
-        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 5000) {
+        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 1000) {
           setIsCollapsed(true)
         }
-      }, 5000)
+      }, 1000)
     }
   }, [])
 
@@ -134,7 +134,6 @@ export default function ChatInput() {
   const getRandomResponse = (userMessage: string) => {
     const lowercaseMessage = userMessage.toLowerCase().trim();
     
-    // Check for direct greetings
     if (DIRECT_RESPONSES[lowercaseMessage]) {
       return {
         type: 'text' as const,
@@ -142,7 +141,6 @@ export default function ChatInput() {
       };
     }
 
-    // Default random response behavior
     const shouldShowMeme = Math.random() < 0.3;
     
     if (shouldShowMeme) {
@@ -255,7 +253,17 @@ export default function ChatInput() {
 
   if (isCollapsed && !isExpanded) {
     return (
-      <div className="fixed bottom-4 right-4">
+      <motion.div 
+        className="fixed bottom-4 right-4"
+        initial={{ opacity: 0, scale: 0.5, x: '100%' }}
+        animate={{ opacity: 1, scale: 1, x: 0 }}
+        exit={{ opacity: 0, scale: 0.5, x: '100%' }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25
+        }}
+      >
         <motion.button
           onClick={handleExpand}
           className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl"
@@ -264,12 +272,23 @@ export default function ChatInput() {
         >
           <Keyboard className="h-6 w-6" />
         </motion.button>
-      </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4" onMouseEnter={handleInteraction}>
+    <motion.div 
+      className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4"
+      onMouseEnter={handleInteraction}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 25
+      }}
+    >
       <motion.div 
         className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
         initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
@@ -281,7 +300,7 @@ export default function ChatInput() {
         transition={{ duration: 0.3 }}
       >
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {isExpanded && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
@@ -426,6 +445,6 @@ export default function ChatInput() {
           </div>
         </form>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }

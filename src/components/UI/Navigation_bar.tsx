@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
     { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
     { name: "about us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
-    { name: "GMTOS", href: "/gmtos", icon: <Envelope className="w-5 h-5" /> },
+    { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
   ];
 
   // Handle navbar background on scroll

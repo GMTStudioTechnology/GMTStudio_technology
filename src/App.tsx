@@ -5,6 +5,8 @@ import Preview from "./components/layout/preview";
 import AboutUs from "../src/components/UI/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
+import OnlineTools from "./components/UI/onlineTools"
+import List from "./components/UI/Cool_item/List"
 function App() {
   return (
     <div className="App">
@@ -15,10 +17,12 @@ function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/preview" element={<Preview />} />
           <Route path="/aboutus" element={<AboutUs />} />
+          <Route path="/onlinetools" element={<OnlineTools />} />
         </Routes>
       </div>
 
     </Router>
+    <List/>
     <Input/>
     </div>
   );
