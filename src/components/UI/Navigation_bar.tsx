@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   House,
   CircleInfo,
@@ -10,19 +10,34 @@ import {
   Magnifier
 } from '@gravity-ui/icons';
 import GMTLogo from "../assets/Gicon.png"
-
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: JSX.Element;
+}
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<NavigationItem[]>([]);
 
+  const searchSuggestions: NavigationItem[] = [
+    { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
+    { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
+    { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
+    { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
+    { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
+    { name: "Mazs", href: "/news1", icon: <Picture className="w-5 h-5" /> },
+    // Add any additional search suggestions here
+  ];
   const navigation = [
     { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
     { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
+    
   ];
 
   useEffect(() => {
@@ -43,18 +58,36 @@ const Navbar: React.FC = () => {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
 
+    const filteredResults = searchSuggestions.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setSearchResults(filteredResults);
+  }, [searchQuery]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality
-    console.log("Searching for:", searchQuery);
+    if (searchResults.length > 0) {
+      window.location.href = searchResults[0].href;
+    }
+  };
+
+  const handleResultClick = (href: string) => {
+    window.location.href = href;
+    setSearchQuery('');
+    setSearchResults([]);
+    setSearchFocused(false);
   };
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed w-full z-50  ${
+      className={`fixed w-full z-50 ${
         isScrolled
           ? "bg-white backdrop-blur-lg shadow-lg"
           : "bg-white backdrop-blur-sm"
@@ -100,30 +133,57 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex md:items-center">
-            <motion.form 
-              onSubmit={handleSearch}
-              className="relative"
-              animate={{ width: searchFocused ? '400px' : '300px' }}
-              transition={{ duration: 0.3 }}
-            >
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                className="w-full px-4 py-2 rounded-full border-2   bg-white text-black placeholder-black outline-none transition-all duration-300"
-              />
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-indigo-600 transition-colors"
+            <div className="relative">
+              <motion.form 
+                onSubmit={handleSearch}
+                className="relative"
+                animate={{ width: searchFocused ? '400px' : '300px' }}
+                transition={{ duration: 0.3 }}
               >
-                <Magnifier className="w-5 h-5" />
-              </motion.button>
-            </motion.form>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                  className="w-full px-4 py-2 rounded-full border-2 bg-white text-black placeholder-black outline-none transition-all duration-300"
+                />
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-indigo-600 transition-colors"
+                >
+                  <Magnifier className="w-5 h-5" />
+                </motion.button>
+              </motion.form>
+
+              <AnimatePresence>
+                {searchFocused && searchResults.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg overflow-hidden"
+                  >
+                    {searchResults.map((result, index) => (
+                      <motion.div
+                        key={result.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={() => handleResultClick(result.href)}
+                        className="flex items-center space-x-3 px-4 py-3 cursor-pointer hover:bg-gray-100"
+                      >
+                        <span className="text-gray-600">{result.icon}</span>
+                        <span className="text-black">{result.name}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           <motion.button
@@ -173,25 +233,31 @@ const Navbar: React.FC = () => {
       >
         <div className="md:hidden bg-white/95 backdrop-blur-lg shadow-lg">
           <div className="px-4 pt-2 pb-3 space-y-1">
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:border-indigo-500 bg-white/90 text-gray-800 placeholder-gray-500 outline-none"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-indigo-600"
-                >
-                  <Magnifier className="w-5 h-5" />
-                </button>
-              </div>
-            </form>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:border-indigo-500 bg-white/90 text-gray-800 placeholder-gray-500 outline-none"
+              />
+              {searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+                  {searchResults.map((result) => (
+                    <div
+                      key={result.href}
+                      onClick={() => handleResultClick(result.href)}
+                      className="flex items-center space-x-3 px-4 py-3 cursor-pointer hover:bg-gray-100"
+                    >
+                      <span className="text-gray-600">{result.icon}</span>
+                      <span className="text-black">{result.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             
-            {navigation.map((item) => (
+            {searchSuggestions.map((item) => (
               <motion.a
                 key={item.name}
                 href={item.href}
