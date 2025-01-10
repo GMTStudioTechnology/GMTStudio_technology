@@ -34,7 +34,7 @@ const wrap = (min: number, max: number, v: number) => {
 
 function ParallaxText({
   children,
-  baseVelocity = 100,
+  baseVelocity = 50, // Reduced baseVelocity for slower scrolling
   ...props
 }: ParallaxProps) {
   const baseX = useMotionValue(0);
@@ -104,7 +104,7 @@ function ParallaxText({
 }
 
 export function VelocityScroll({
-  defaultVelocity = 5,
+  defaultVelocity = 2.5, // Reduced defaultVelocity for slower scrolling
   numRows = 2,
   children,
   className,

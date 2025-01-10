@@ -5,7 +5,7 @@ import ThinkLink from "../assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
 import Video from "../assets/A.mov";
 import Video2 from "../assets/B.mov"
-
+import Vol from "../UI/MainPage/VelocityScroll"
 interface ProjectSectionProps {
   title: string;
   description: string;
@@ -208,6 +208,9 @@ const Projects = () => {
       {projects.map((project, index) => (
         <ProjectSection key={index} {...project} />
       ))}
+    <Vol className="bg-black pb-8">
+      GMTStudio • Mazs AI • ThinkLink
+    </Vol>
     </div>
   );
 };
