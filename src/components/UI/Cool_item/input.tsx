@@ -380,7 +380,7 @@ export default function ChatInput() {
   if (isCollapsed && !isExpanded) {
     return (
       <motion.div
-        className="fixed bottom-4 right-4"
+        className="fixed bottom-4 right-4 scrollbar-hide"
         initial={{ opacity: 0, scale: 0.5, x: '100%' }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
         exit={{ opacity: 0, scale: 0.5, x: '100%' }}
@@ -392,7 +392,7 @@ export default function ChatInput() {
       >
         <motion.button
           onClick={() => setIsExpanded(true)}
-          className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl"
+          className="bg-black/90 border border-white/20 rounded-full p-4 text-white/80 hover:text-white transition-colors backdrop-blur-xl scrollbar-hide"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -405,7 +405,7 @@ export default function ChatInput() {
   return (
     <>
       <motion.div
-        className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4"
+        className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4 scrollbar-hide"
         onMouseEnter={handleInteraction}
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -417,7 +417,7 @@ export default function ChatInput() {
         }}
       >
         <motion.div
-          className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden"
+          className="rounded-[24px] bg-black/90 border border-white/20 backdrop-blur-xl overflow-hidden scrollbar-hide"
           initial={{ boxShadow: "0 0 0 rgba(255,255,255,0)" }}
           animate={{
             boxShadow: conversation.length > 0 || isThinking
@@ -440,7 +440,7 @@ export default function ChatInput() {
                   }}
                   className="border-b border-white/10"
                 >
-                  <div className="h-[400px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  <div className="h-[400px] overflow-y-auto p-4 scrollbar-hide">
                     {conversation.map((msg, idx) => (
                       <motion.div
                         key={idx}
