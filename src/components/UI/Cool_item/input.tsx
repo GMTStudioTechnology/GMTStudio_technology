@@ -200,12 +200,12 @@ export default function ChatInput() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!message.trim() && !selectedFile) || isThinking) return; // Allow only message or selectedFile
+    if ((!message.trim() && !selectedFile) || isThinking) return;
 
     const userMessage: Message = {
       sender: 'user',
       text: message,
-      type: selectedFile ? 'text' : 'text', // Set type to text for file too (later we can render it differently if needed)
+      type: selectedFile ? 'text' : 'text',
       file: selectedFile,
       status: 'sent',
       timestamp: new Date()
@@ -213,8 +213,7 @@ export default function ChatInput() {
 
     setConversation([...conversation, userMessage]);
     setMessage('');
-    setSelectedFile(null); // Clear selected file after sending
-    setIsThinking(true);
+    setSelectedFile(null);
 
     if (!isExpanded) {
       setIsExpanded(true);
@@ -222,7 +221,7 @@ export default function ChatInput() {
 
     if (message.includes('@thinklink')) {
       const taskDescription = message.replace('@thinklink', '').trim();
-      const dueTime = new Date().toLocaleTimeString(); // Example due time
+      const dueTime = new Date().toLocaleTimeString();
       setTasks([...tasks, { description: taskDescription, dueTime }]);
       setThinkLinkTaskDescription(taskDescription);
       setIsThinking(false);
@@ -242,6 +241,7 @@ export default function ChatInput() {
       return;
     }
 
+    // Update to 'delivered' status after 2 seconds
     setTimeout(() => {
       setConversation(prev =>
         prev.map((msg, idx) =>
@@ -250,34 +250,35 @@ export default function ChatInput() {
       );
     }, 2000);
 
-    // Add read status 1.5 seconds before bot message
+    // Update to 'read' status after another 2.5 seconds and start thinking
     setTimeout(() => {
       setConversation(prev =>
         prev.map((msg, idx) =>
           idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
         )
       );
-    }, 2500); // 2.5 seconds
 
-    setTimeout(() => {
-      const botResponse = getRandomResponse(message, selectedFile);
-      const botMessage: Message = {
-        sender: 'bot',
-        status: 'read',
-        timestamp: new Date(),
-        text: botResponse.text || '',
-        type: botResponse.type,
-        image: botResponse.image,
-      };
+      // Only start thinking after message is read
+      setIsThinking(true);
 
-      setConversation(prev => [
-        ...prev,
-        botMessage
-      ]);
-      setIsThinking(false);
-    }, 4500);
-  }
+      // Generate bot response after 2 seconds of thinking
+      setTimeout(() => {
+        const botResponse = getRandomResponse(message, selectedFile);
+        const botMessage: Message = {
+          sender: 'bot',
+          status: 'read',
+          timestamp: new Date(),
+          text: botResponse.text || '',
+          type: botResponse.type,
+          image: botResponse.image,
+        };
 
+        setIsThinking(false);
+        setConversation(prev => [...prev, botMessage]);
+      }, 2000);
+
+    }, 2500);
+}
   const handleAttach = () => {
     setIsAttachOpen(!isAttachOpen);
   };
@@ -487,19 +488,29 @@ export default function ChatInput() {
                       </motion.div>
                     ))}
 
-                    {isThinking && (
+              {isThinking && (
                       <motion.div
                         className="flex gap-2 items-center p-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{
+                          opacity: [0, 0, 0, 1],
+                          height: [0, 0, 0, 'auto'],
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          times: [0, 0.8, 0.9, 1],
+                          delay: 0, // Changed delay to 0
+                        }}
                       >
                         <div className="flex gap-1">
                           {[0, 1, 2].map((i) => (
                             <motion.div
                               key={i}
                               className="w-2 h-2 bg-gray-400 rounded-full"
-                              animate={{ y: ["0%", "-50%", "0%"] }}
+                              animate={{
+                                y: ['0%', '-50%', '0%'],
+                                scale: [1, 1.2, 1],
+                              }}
                               transition={{
                                 duration: 0.6,
                                 repeat: Infinity,
