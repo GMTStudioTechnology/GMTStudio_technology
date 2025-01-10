@@ -9,6 +9,7 @@ import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
 import Meme4 from "../../assets/Meme_3.png"
 import Meme5 from "../../assets/Meme_4.jpg"
+
 const TextGenerateEffect = ({
   words,
   className,
@@ -85,7 +86,7 @@ const DIRECT_RESPONSES: Record<string, string> = {
   "nothing":"(╯°□°)╯︵ ┻━┻ then why you ask ? ",
   "uh I don't know":" (´･ω･`) are you joking with me right now ?",
   "uh":"what ?",
-  "?":" (╯°□°)╯︵ ┻━┻ what ! type it out ! ", 
+  "?":" (╯°□°)╯︵ ┻━┻ what ! type it out", 
 
 };
 
@@ -94,7 +95,7 @@ export default function ChatInput() {
   const [conversation, setConversation] = useState<Message[]>([])
   const [isThinking, setIsThinking] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true) // Changed initial state to true
   const [, setThinkLinkTaskDescription] = useState('')
   const [tasks, setTasks] = useState<Task[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -124,10 +125,10 @@ export default function ChatInput() {
       setIsCollapsed(false)
 
       collapseTimeoutRef.current = setTimeout(() => {
-        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 3000) {
+        if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 0) { // Changed to 1000ms
           setIsCollapsed(true)
         }
-      }, 3000)
+      }, 0) // Changed to 1000ms
     }
   }, [])
 
@@ -154,52 +155,50 @@ export default function ChatInput() {
     scrollToBottom()
   }, [conversation, isThinking])
 
-    const getRandomResponse = (userMessage: string, file?: File | null) => {
-        const lowercaseMessage = userMessage.toLowerCase().trim();
+  const getRandomResponse = (userMessage: string, file?: File | null) => {
+    const lowercaseMessage = userMessage.toLowerCase().trim();
 
-        if (DIRECT_RESPONSES[lowercaseMessage]) {
-            return {
-                type: 'text' as const,
-                text: DIRECT_RESPONSES[lowercaseMessage]
-            };
-        }
-
-      if (file) {
-          return {
-              type: 'text' as const,
-            text: "I see you have attached a file, This Feature is not available yet."
-        }
+    if (DIRECT_RESPONSES[lowercaseMessage]) {
+      return {
+        type: 'text' as const,
+        text: DIRECT_RESPONSES[lowercaseMessage]
+      };
     }
 
-        const shouldShowMeme = Math.random() < 0.3;
-
-        if (shouldShowMeme) {
-            const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
-            return {
-                type: 'image' as const,
-                text: '',
-                image: catMemes[randomMemeIndex]
-            };
-        }
-
-        const responses = data.AI?.answer || [];
-        if (responses.length === 0) {
-            return {
-                type: 'text' as const,
-                text: "I'm not sure how to respond to that."
-            };
-        }
-
-        const randomIndex = Math.floor(Math.random() * responses.length);
-        return {
-            type: 'text' as const,
-            text: responses[randomIndex]
-        };
+    if (file) {
+      return {
+        type: 'text' as const,
+        text: "I see you have attached a file, This Feature is not available yet."
+      }
     }
 
+    const shouldShowMeme = Math.random() < 0.3;
 
+    if (shouldShowMeme) {
+      const randomMemeIndex = Math.floor(Math.random() * catMemes.length);
+      return {
+        type: 'image' as const,
+        text: '',
+        image: catMemes[randomMemeIndex]
+      };
+    }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const responses = data.AI?.answer || [];
+    if (responses.length === 0) {
+      return {
+        type: 'text' as const,
+        text: "I'm not sure how to respond to that."
+      };
+    }
+
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    return {
+      type: 'text' as const,
+      text: responses[randomIndex]
+    };
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if ((!message.trim() && !selectedFile) || isThinking) return; // Allow only message or selectedFile
 
@@ -207,7 +206,7 @@ export default function ChatInput() {
       sender: 'user',
       text: message,
       type: selectedFile ? 'text' : 'text', // Set type to text for file too (later we can render it differently if needed)
-        file: selectedFile,
+      file: selectedFile,
       status: 'sent',
       timestamp: new Date()
     };
@@ -221,124 +220,122 @@ export default function ChatInput() {
       setIsExpanded(true);
     }
 
-     if (message.includes('@thinklink')) {
-            const taskDescription = message.replace('@thinklink', '').trim();
-            const dueTime = new Date().toLocaleTimeString(); // Example due time
-            setTasks([...tasks, { description: taskDescription, dueTime }]);
-            setThinkLinkTaskDescription(taskDescription);
-            setIsThinking(false);
-            const botMessage: Message = {
-                sender: 'bot',
-                status: 'read',
-                timestamp: new Date(),
-                text: `I will remember to notify you that your task is due at ${dueTime}.`,
-                type: 'text'
-            };
-            setConversation(prev => [
-                ...prev.map((msg, idx) =>
-                    idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
-                ),
-                botMessage
-            ]);
-            return;
-        }
+    if (message.includes('@thinklink')) {
+      const taskDescription = message.replace('@thinklink', '').trim();
+      const dueTime = new Date().toLocaleTimeString(); // Example due time
+      setTasks([...tasks, { description: taskDescription, dueTime }]);
+      setThinkLinkTaskDescription(taskDescription);
+      setIsThinking(false);
+      const botMessage: Message = {
+        sender: 'bot',
+        status: 'read',
+        timestamp: new Date(),
+        text: `I will remember to notify you that your task is due at ${dueTime}.`,
+        type: 'text'
+      };
+      setConversation(prev => [
+        ...prev.map((msg, idx) =>
+          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+        ),
+        botMessage
+      ]);
+      return;
+    }
 
-        setTimeout(() => {
-          setConversation(prev =>
-            prev.map((msg, idx) =>
-              idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
-            )
-          );
-        }, 2000);
-        
-        // Add read status 1.5 seconds before bot message
-        setTimeout(() => {
-          setConversation(prev =>
-            prev.map((msg, idx) =>
-              idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
-            )
-          );
-        }, 2500); // 2.5 seconds
-        
-        setTimeout(() => {
-          const botResponse = getRandomResponse(message, selectedFile);
-          const botMessage: Message = {
-            sender: 'bot',
-            status: 'read',
-            timestamp: new Date(),
-            text: botResponse.text || '',
-            type: botResponse.type,
-            image: botResponse.image,
-          };
-        
-          setConversation(prev => [
-            ...prev,
-            botMessage
-          ]);
-          setIsThinking(false);
-        }, 4500);
-      }
+    setTimeout(() => {
+      setConversation(prev =>
+        prev.map((msg, idx) =>
+          idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
+        )
+      );
+    }, 2000);
+
+    // Add read status 1.5 seconds before bot message
+    setTimeout(() => {
+      setConversation(prev =>
+        prev.map((msg, idx) =>
+          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+        )
+      );
+    }, 2500); // 2.5 seconds
+
+    setTimeout(() => {
+      const botResponse = getRandomResponse(message, selectedFile);
+      const botMessage: Message = {
+        sender: 'bot',
+        status: 'read',
+        timestamp: new Date(),
+        text: botResponse.text || '',
+        type: botResponse.type,
+        image: botResponse.image,
+      };
+
+      setConversation(prev => [
+        ...prev,
+        botMessage
+      ]);
+      setIsThinking(false);
+    }, 4500);
+  }
 
   const handleAttach = () => {
-        setIsAttachOpen(!isAttachOpen);
-    };
+    setIsAttachOpen(!isAttachOpen);
+  };
 
   const handleGlobe = () => {
-      // Example: Open a new tab with a default search engine
-     window.open('/preview', '_blank');
+    // Example: Open a new tab with a default search engine
+    window.open('/preview', '_blank');
   };
 
   const handleGear = () => {
-      setIsSettingsOpen(!isSettingsOpen);
+    setIsSettingsOpen(!isSettingsOpen);
   };
 
-    const handleMicrophone = async () => {
-        if (isRecording) {
-            if (mediaRecorder) {
-                 mediaRecorder.stop();
-             }
-            setIsRecording(false);
+  const handleMicrophone = async () => {
+    if (isRecording) {
+      if (mediaRecorder) {
+        mediaRecorder.stop();
+      }
+      setIsRecording(false);
 
-            return;
-        }
+      return;
+    }
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-           const recorder = new MediaRecorder(stream);
-            setMediaRecorder(recorder);
-            recorder.ondataavailable = (event) => {
-                if(event.data.size > 0) {
-                    setAudioChunks((prevChunks) => [...prevChunks, event.data])
-                }
-            };
-            recorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-               setAudioChunks([]);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+      recorder.ondataavailable = (event) => {
+        if(event.data.size > 0) {
+          setAudioChunks((prevChunks) => [...prevChunks, event.data])
+        }
+      };
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        setAudioChunks([]);
 
-                 const audioUrl = URL.createObjectURL(audioBlob);
-                  const botMessage: Message = {
-                      sender: 'bot',
-                      status: 'read',
-                      timestamp: new Date(),
-                      text: `[Audio Message]`,
-                      type: 'text'
-                  }
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const botMessage: Message = {
+          sender: 'bot',
+          status: 'read',
+          timestamp: new Date(),
+          text: `[Audio Message]`,
+          type: 'text'
+        }
 
-                   setConversation((prev) => [
-                        ...prev,
-                        botMessage,
-                   ]);
+        setConversation((prev) => [
+          ...prev,
+          botMessage,
+        ]);
 
-               const audioElement = new Audio(audioUrl);
-                audioElement.play()
-            }
-        recorder.start();
-        setIsRecording(true);
+        const audioElement = new Audio(audioUrl);
+        audioElement.play()
+      }
+      recorder.start();
+      setIsRecording(true);
     } catch(error) {
-    console.error("Error accessing microphone", error);
+      console.error("Error accessing microphone", error);
     }
   };
-
-
 
   const toggleExpand = () => {
     const newExpandedState = !isExpanded
@@ -362,22 +359,22 @@ export default function ChatInput() {
     setIsModalOpen(false);
   }
 
-    const handleCloseAttachMenu = () => {
-        setIsAttachOpen(false);
-    };
-    const handleCloseSettingsMenu = () => {
-        setIsSettingsOpen(false);
-    };
+  const handleCloseAttachMenu = () => {
+    setIsAttachOpen(false);
+  };
+  const handleCloseSettingsMenu = () => {
+    setIsSettingsOpen(false);
+  };
 
-    const handleFileAttach = (file: File) => {
-        setSelectedFile(file)
-        handleCloseAttachMenu();
-    };
+  const handleFileAttach = (file: File) => {
+    setSelectedFile(file)
+    handleCloseAttachMenu();
+  };
 
-    const handleSettingAction = (action:string) => {
-          alert(`clicked ${action} button in settings`)
-          handleCloseSettingsMenu();
-    }
+  const handleSettingAction = (action:string) => {
+    alert(`clicked ${action} button in settings`)
+    handleCloseSettingsMenu();
+  }
 
   if (isCollapsed && !isExpanded) {
     return (
@@ -474,12 +471,11 @@ export default function ChatInput() {
                               filter={true}
                               duration={0.5}
                             />
-                           ) :  msg.file ? (
-
+                          ) :  msg.file ? (
                             <span className="text-sm">
-                                Attached File: {msg.file.name}
+                              Attached File: {msg.file.name}
                             </span>
-                           ) : (
+                          ) : (
                             <span className="text-sm">{msg.text}</span>
                           )}
                         </div>
@@ -527,82 +523,82 @@ export default function ChatInput() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                 <button
-                        type="button"
-                        className="relative"
-                        onClick={handleAttach}
-                    >
-                        <div className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
-                            <Plus className="h-5 w-5" />
-                            <span className="text-sm text-white/60">Attach</span>
-                        </div>
+                <button
+                  type="button"
+                  className="relative"
+                  onClick={handleAttach}
+                >
+                  <div className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+                    <Plus className="h-5 w-5" />
+                    <span className="text-sm text-white/60">Attach</span>
+                  </div>
 
-                        {isAttachOpen && (
-                            <motion.div
-                                className="absolute bottom-12 left-0 bg-black border border-white/20 rounded-lg p-2 z-50"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                            >
-                                <div className="flex flex-col">
-                                    <input
-                                        type="file"
-                                        id="file-upload"
-                                        style={{ display: 'none' }}
-                                        onChange={(e) => {
-                                            if (e.target.files) {
-                                                handleFileAttach(e.target.files[0])
-                                            }
-                                        }}
-                                    />
-                                    <label
-                                        htmlFor="file-upload"
-                                        className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-lg"
-                                    >
-                                        Attach File
-                                    </label>
-                                    <button
-                                        onClick={handleCloseAttachMenu}
-                                        className="hover:bg-white/10 px-4 py-2 rounded-lg"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-                    </button>
+                  {isAttachOpen && (
+                    <motion.div
+                      className="absolute bottom-12 left-0 bg-black border border-white/20 rounded-lg p-2 z-50"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                    >
+                      <div className="flex flex-col">
+                        <input
+                          type="file"
+                          id="file-upload"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              handleFileAttach(e.target.files[0])
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor="file-upload"
+                          className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-lg"
+                        >
+                          Attach File
+                        </label>
+                        <button
+                          onClick={handleCloseAttachMenu}
+                          className="hover:bg-white/10 px-4 py-2 rounded-lg"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </button>
 
                 <button type="button" className="p-1 text-white/80 hover:text-white transition-colors" onClick={handleGlobe}>
                   <Globe className="h-5 w-5" />
                 </button>
                 <button type="button" className="relative" onClick={handleGear}>
-                         <div className="p-1 text-white/80 hover:text-white transition-colors">
-                           <Gear className="h-5 w-5" />
-                         </div>
-                        {isSettingsOpen && (
-                                    <motion.div
-                                    className="absolute bottom-12 right-0 bg-black border border-white/20 rounded-lg p-2 z-50"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                    >
-                                        <div className="flex flex-col">
-                                            <button onClick={handleCloseSettingsMenu} className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                Close
-                                            </button>
-                                            <button onClick={()=> handleSettingAction("settings")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                Settings
-                                            </button>
-                                            <button onClick={()=> handleSettingAction("privacy")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                Privacy
-                                            </button>
-                                            <button onClick={()=> handleSettingAction("security")}  className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                 Security
-                                            </button>
+                  <div className="p-1 text-white/80 hover:text-white transition-colors">
+                    <Gear className="h-5 w-5" />
+                  </div>
+                  {isSettingsOpen && (
+                    <motion.div
+                      className="absolute bottom-12 right-0 bg-black border border-white/20 rounded-lg p-2 z-50"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                    >
+                      <div className="flex flex-col">
+                        <button onClick={handleCloseSettingsMenu} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                          Close
+                        </button>
+                        <button onClick={()=> handleSettingAction("settings")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                          Settings
+                        </button>
+                        <button onClick={()=> handleSettingAction("privacy")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                          Privacy
+                        </button>
+                        <button onClick={()=> handleSettingAction("security")}  className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                          Security
+                        </button>
 
-                                        </div>
-                                    </motion.div>
-                        )}
+                      </div>
+                    </motion.div>
+                  )}
                 </button>
               </motion.div>
 
@@ -626,8 +622,8 @@ export default function ChatInput() {
                 transition={{ delay: 0.2 }}
               >
                 <button type="button" className={`p-1 text-white/80 hover:text-white transition-colors ${isRecording ? 'text-red-500' : ''}`} onClick={handleMicrophone}>
-                    <Microphone className="h-5 w-5" />
-                  </button>
+                  <Microphone className="h-5 w-5" />
+                </button>
                 <button
                   type="submit"
                   className="p-1 text-white/80 hover:text-white transition-colors"
