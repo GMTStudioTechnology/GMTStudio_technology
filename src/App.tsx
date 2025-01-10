@@ -7,6 +7,7 @@ import AboutUs from "../src/components/UI/AboutUs";
 import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/UI/onlineTools"
 import News from "./components/UI/News";
+import News1 from "./components/UI/News/News1"
 function App() {
   return (
     <div className="App">
@@ -19,6 +20,8 @@ function App() {
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
           <Route path="/news" element={<News />} />
+          
+          <Route path="/news1" element={<News1 />} />
         </Routes>
       </div>
 

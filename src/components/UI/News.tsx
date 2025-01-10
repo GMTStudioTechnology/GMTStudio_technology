@@ -42,7 +42,6 @@ const EnhancedImage: React.FC<{ src: string; alt: string; className?: string }> 
   );
 };
 
-// Modern Card Component
 const NewsCard: React.FC<NewsCardProps> = ({
   size = 'default',
   children,
@@ -67,12 +66,8 @@ const NewsCard: React.FC<NewsCardProps> = ({
         ${sizeClasses[size]} ${className}
       `}
     >
-      {children}
-      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:translate-x-1">
-        <ArrowUpRight className="text-zinc-400" size={20} />
-      </div>
       {(date || category) && (
-        <div className="absolute bottom-4 left-4 flex items-center gap-3 text-sm text-zinc-500">
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 text-sm">
           {category && (
             <span className="flex items-center gap-2 bg-zinc-800/50 px-3 py-1 rounded-full backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
@@ -80,13 +75,17 @@ const NewsCard: React.FC<NewsCardProps> = ({
             </span>
           )}
           {date && (
-            <span className="flex items-center gap-2 bg-zinc-800/50 px-3 py-1 rounded-full backdrop-blur-sm">
+            <span className="flex items-center gap-2 bg-zinc-800/50 px-3 py-1 rounded-full backdrop-blur-sm text-zinc-500">
               <CalendarDays size={14} />
               {date}
             </span>
           )}
         </div>
       )}
+      {children}
+      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:translate-x-1">
+        <ArrowUpRight className="text-zinc-400" size={20} />
+      </div>
     </a>
   );
 };
@@ -145,14 +144,15 @@ const HomePage: React.FC = () => {
       id: '1',
       title: 'Mazs AI User Interface Update',
       description:
-        "We've redesigned the Mazs AI interface for a more intuitive and powerful user experience, featuring enhanced visualization capabilities and streamlined workflows.",
+        "We've redesign our user interface to provide better experience",
       category: 'UI Update',
       date: 'January 9, 2025',
-      href: '#',
+      href: '/news1',
     },
     {
       id: '2',
       title: 'Think Link Development',
+      description:"We've also redesign ThinkLink UI ",
       category: 'Software Design',
       date: 'January 8, 2025',
       href: '#',
@@ -171,13 +171,7 @@ const HomePage: React.FC = () => {
       date: 'January 10, 2025',
       href: '#',
     },
-    {
-      id: '5',
-      title: 'Think Link Mobile App',
-      category: 'Mobile Design',
-      date: 'January 6, 2025',
-      href: '#',
-    },
+
   ];
 
   const moreNews: NewsItem[] = [

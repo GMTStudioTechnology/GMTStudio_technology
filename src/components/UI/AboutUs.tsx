@@ -15,51 +15,49 @@ interface TimelineEntry {
 
 const data: TimelineEntry[] = [
   {
-    title: "2025 Q1",
+    title: "2024 Q1",
     date: "January 2024",
-    category: "official website design v2",
+    category: "Founded in 2024",
     content: (
       <div className="space-y-6">
         <img 
-          src={launch2025}
-          alt="2024 Launch" 
+          src={Found}
+          alt="Founding Phase" 
           className="rounded-lg w-full object-cover"
         />
-        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-          <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-2">Redesign the official website</h4>
-          <p className="text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
-            We are trying to redesign our official website due to the fact that the old one is not fully user-friendly, and the UI is not that good, so we decided to remake it.
-          </p>
-        </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "expect release date", value: "2025 July 1st" },
-            { label: "deploy on ", value: "Vercel" },
-          ].map((stat, index) => (
-            <div key={index} className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow-sm">
-              <div className="font-bold text-xl mb-1">{stat.value}</div>
-              <div className="text-sm text-neutral-600 dark:text-neutral-400">{stat.label}</div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
+            <h4 className="font-bold mb-4">what we have done</h4>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2">
+                <span className="text-blue-500">▪</span>
+                <span>Design the ThinkLink platform</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-blue-500">▪</span>
+                <span>train an artificial intelligence model </span>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
+            <h4 className="font-bold mb-4">founder of GMTStudio</h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span>Founder one</span>
+                <span className="font-bold">Alston Chang</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Founder Two</span>
+                <span className="font-bold">Lucas Yeh</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Founder Three</span>
+                <span className="font-bold">Willy Lin</span>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
-          <h4 className="font-bold mb-4">Q1 2025 </h4>
-          <ul className="space-y-3">
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Remake all service website</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>keep updating AI model</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
-              <span>Develop more tools for better user experience </span>
-            </li>
-          </ul>
+          </div>
         </div>
       </div>
     ),
@@ -119,54 +117,57 @@ const data: TimelineEntry[] = [
       </div>
     ),
   },
+
   {
-    title: "2024 Q1",
+    title: "2025 Q1",
     date: "January 2024",
-    category: "Founded in 2024",
+    category: "official website design v2",
     content: (
       <div className="space-y-6">
         <img 
-          src={Found}
-          alt="Founding Phase" 
+          src={launch2025}
+          alt="2024 Launch" 
           className="rounded-lg w-full object-cover"
         />
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+          <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-2">Redesign the official website</h4>
+          <p className="text-neutral-800 dark:text-neutral-200 text-sm leading-relaxed">
+            We are trying to redesign our official website due to the fact that the old one is not fully user-friendly, and the UI is not that good, so we decided to remake it.
+          </p>
+        </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
-            <h4 className="font-bold mb-4">what we have done</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2">
-                <span className="text-blue-500">▪</span>
-                <span>Design the ThinkLink platform</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-blue-500">▪</span>
-                <span>train an artificial intelligence model </span>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
-            <h4 className="font-bold mb-4">founder of GMTStudio</h4>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span>Founder one</span>
-                <span className="font-bold">Alston Chang</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Founder Two</span>
-                <span className="font-bold">Lucas Yeh</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Founder Three</span>
-                <span className="font-bold">Willy Lin</span>
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: "expect release date", value: "2025 July 1st" },
+            { label: "deploy on ", value: "Vercel" },
+          ].map((stat, index) => (
+            <div key={index} className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow-sm">
+              <div className="font-bold text-xl mb-1">{stat.value}</div>
+              <div className="text-sm text-neutral-600 dark:text-neutral-400">{stat.label}</div>
             </div>
-          </div>
+          ))}
+        </div>
+
+        <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg">
+          <h4 className="font-bold mb-4">Q1 2025 </h4>
+          <ul className="space-y-3">
+            <li className="flex items-center gap-2">
+              <span className="text-green-500">✓</span>
+              <span>Remake all service website</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-green-500">✓</span>
+              <span>keep updating AI model</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-green-500">✓</span>
+              <span>Develop more tools for better user experience </span>
+            </li>
+          </ul>
         </div>
       </div>
     ),
-  },
+  },  
 ];
 
 export const Timeline = () => {
@@ -198,7 +199,7 @@ export const Timeline = () => {
           <h2 className="text-4xl md:text-6xl font-bold mb-8 text-black dark:text-white">
             About US
           </h2>
-          <p className="text-neutral-700 dark:text-neutral-300 text-xl leading-relaxed">
+          <p className="text-white text-xl leading-relaxed">
             We are a bunch of student who want to enhance the user experience quality to perfect, and we also want to make some games and software to improve the whole industry.
           </p>
         </div>
@@ -237,8 +238,10 @@ export const Timeline = () => {
                   <span className="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm mt-2">
                     {item.category}
                   </span>
+                  
                 )}
               </div>
+                
               {item.content}
             </div>
           </div>
