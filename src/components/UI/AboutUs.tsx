@@ -182,9 +182,9 @@ export const Timeline = () => {
     }
   }, [ref]);
 
-  const { scrollYProgress } = useScroll({
+const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 10%", "end 50%"],
+    offset: ["start 0%", "end 100%"],
   });
 
   const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
@@ -213,7 +213,7 @@ export const Timeline = () => {
                 <div className="h-4 w-4 rounded-full bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 p-2" />
               </div>
               <div className="hidden md:block md:pl-20">
-                <h3 className="text-4xl font-bold text-neutral-500 dark:text-neutral-500">
+                <h3 className={`text-4xl font-bold ${scrollYProgress.get() >= (index / data.length) && scrollYProgress.get() < ((index + 1) / data.length) ? 'text-white' : 'text-neutral-500'} dark:text-neutral-500`}>
                   {item.title}
                 </h3>
                 {item.date && (
