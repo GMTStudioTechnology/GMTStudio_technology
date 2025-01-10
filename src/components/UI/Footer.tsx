@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Facebook, Twitter, Instagram, Mail } from 'lucide-react';
+import {  Instagram, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
@@ -31,12 +31,11 @@ const Footer = () => {
   };
 
   const socialIcons = [
-    { icon: <Facebook className="w-5 h-5" />, name: 'Facebook' },
-    { icon: <Twitter className="w-5 h-5" />, name: 'Twitter' },
+
     { icon: <Instagram className="w-5 h-5" />, name: 'Instagram' }
   ];
 
-  const quickLinks = ['About', 'Services', 'Contact', 'Blog'];
+  const quickLinks = ['AboutUs'];
 
   return (
     <footer className="bg-black text-white border-t border-white/10">
@@ -72,7 +71,7 @@ const Footer = () => {
             {quickLinks.map((item) => (
               <motion.a
                 key={item}
-                href="#"
+                href="/aboutus"
                 className="text-gray-300 hover:text-white relative group"
                 onHoverStart={() => setIsHovered(item)}
                 onHoverEnd={() => setIsHovered('')}

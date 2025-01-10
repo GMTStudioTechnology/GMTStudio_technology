@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-50   ${
         isScrolled
           ? "bg-white backdrop-blur-lg shadow-lg"
           : "bg-white backdrop-blur-sm"
@@ -153,10 +153,10 @@ const Navbar: React.FC = () => {
       {/* Enhanced Mobile Menu */}
       <Transition
         show={isMobileMenuOpen}
-        enter="transition ease-out duration-300 transform"
+        enter="transition ease-out duration-100 transform"
         enterFrom="-translate-y-full opacity-0"
         enterTo="translate-y-0 opacity-100"
-        leave="transition ease-in duration-200 transform"
+        leave="transition ease-in duration-100 transform"
         leaveFrom="translate-y-0 opacity-100"
         leaveTo="-translate-y-full opacity-0"
       >
