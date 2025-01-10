@@ -8,7 +8,7 @@ import Meme1 from "../../assets/Meme.png"
 import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
 import Meme4 from "../../assets/Meme_3.png"
-
+import Meme5 from "../../assets/Meme_4.jpg"
 const TextGenerateEffect = ({
   words,
   className,
@@ -35,7 +35,7 @@ const TextGenerateEffect = ({
         delay: stagger(0.2),
       }
     );
-  }, [animate, duration, filter, scope.current]);
+  }, );
 
   return (
     <div className={`font-normal ${className || ''}`}>
@@ -82,6 +82,10 @@ const DIRECT_RESPONSES: Record<string, string> = {
   'who are you ?':'I am Mazs AI, An AI that chat with you in a nonsense way. ',
   'what is your purpose ?':'pass the butter ( pass )',
   'who the fuck are you ?' : 'yourself',
+  "nothing":"(╯°□°)╯︵ ┻━┻ then why you ask ? ",
+  "uh I don't know":" (´･ω･`) are you joking with me right now ?",
+  "uh":"what ?",
+  "?":" (╯°□°)╯︵ ┻━┻ what ! type it out ! ", 
 
 };
 
@@ -105,7 +109,7 @@ export default function ChatInput() {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
-  const catMemes = [Meme1, Meme3, Meme2, Meme4];
+  const catMemes = [Meme1, Meme3, Meme2, Meme4,Meme5];
 
   useEffect(() => {
     isExpandedRef.current = isExpanded
@@ -239,34 +243,41 @@ export default function ChatInput() {
             return;
         }
 
-    setTimeout(() => {
-      setConversation(prev =>
-        prev.map((msg, idx) =>
-          idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
-        )
-      );
-    }, 2000);
-
-    setTimeout(() => {
-            const botResponse = getRandomResponse(message, selectedFile);
-      const botMessage: Message = {
-        sender: 'bot',
-        status: 'read',
-        timestamp: new Date(),
-        text: botResponse.text || '',
-        type: botResponse.type,
-          image: botResponse.image,
-      };
-
-      setConversation(prev => [
-        ...prev.map((msg, idx) =>
-          idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
-        ),
-        botMessage
-      ]);
-      setIsThinking(false);
-    }, 4000);
-  };
+        setTimeout(() => {
+          setConversation(prev =>
+            prev.map((msg, idx) =>
+              idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
+            )
+          );
+        }, 2000);
+        
+        // Add read status 1.5 seconds before bot message
+        setTimeout(() => {
+          setConversation(prev =>
+            prev.map((msg, idx) =>
+              idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+            )
+          );
+        }, 2500); // 2.5 seconds
+        
+        setTimeout(() => {
+          const botResponse = getRandomResponse(message, selectedFile);
+          const botMessage: Message = {
+            sender: 'bot',
+            status: 'read',
+            timestamp: new Date(),
+            text: botResponse.text || '',
+            type: botResponse.type,
+            image: botResponse.image,
+          };
+        
+          setConversation(prev => [
+            ...prev,
+            botMessage
+          ]);
+          setIsThinking(false);
+        }, 4500);
+      }
 
   const handleAttach = () => {
         setIsAttachOpen(!isAttachOpen);
@@ -274,7 +285,7 @@ export default function ChatInput() {
 
   const handleGlobe = () => {
       // Example: Open a new tab with a default search engine
-     window.open('https://www.google.com', '_blank');
+     window.open('/preview', '_blank');
   };
 
   const handleGear = () => {

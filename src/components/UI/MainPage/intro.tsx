@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, FC, ReactNode } from "react";
+import  { useRef, FC, ReactNode } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 
 interface IntroProps {
