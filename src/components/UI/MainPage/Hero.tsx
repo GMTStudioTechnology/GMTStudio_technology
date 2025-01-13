@@ -247,8 +247,10 @@ const GMTStudioCarousel: React.FC = () => {
       <main>
         <div className="w-full">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="text-5xl font-bold mb-12 text-center flex flex-col items-center gap-2">
+            <div className="text-5xl font-bold mb-12 text-center flex flex-col items-center gap-2 ">
+              <div className=''>
               <TextGenerateEffect text="Discover What's Possible in" />
+              </div>
               <Highlight>
                 <motion.span
                   className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500"

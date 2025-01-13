@@ -8,6 +8,9 @@ import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/UI/onlineTools"
 import News from "./components/UI/News";
 import News1 from "./components/UI/News/News1"
+import News2 from "./components/UI/News/News2"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 function App() {
   return (
     <div className="App">
@@ -22,11 +25,14 @@ function App() {
           <Route path="/news" element={<News />} />
           
           <Route path="/news1" element={<News1 />} />
+          <Route path="/news2" element={<News2 />} />
         </Routes>
       </div>
 
     </Router>
     <Input/>
+    <Analytics />
+    <SpeedInsights />
     </div>
   );
 }

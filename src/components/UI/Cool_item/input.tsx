@@ -440,7 +440,7 @@ export default function ChatInput() {
                   }}
                   className="border-b border-white/10"
                 >
-                  <div className="h-[400px] overflow-y-auto p-4 scrollbar-hide">
+                  <div className="h-[400px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {conversation.map((msg, idx) => (
                       <motion.div
                         key={idx}

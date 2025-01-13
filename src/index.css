@@ -82,3 +82,6 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;  /* Chrome, Safari, and Opera */
 }
+.hero-text {
+  font-family: 'Playwrite IN', cursive;
+}

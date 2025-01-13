@@ -1,5 +1,5 @@
 import React from 'react';
-import pic1 from "../../assets/MazsAI.png"
+import pic1 from "../../assets/ThinkLink.png"
 import Navbar from '../../UI/Navigation_bar';
 const News1: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const News1: React.FC = () => {
             <ul>
                 <li><a href="/">GMTStudio</a></li>
                 <li><a href="/news">News</a></li>
-                <li>News 1 - Mazs AI User Interface Update </li>
+                <li>News 2 - ThinkLink development </li>
                 </ul>
         </div>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,10 +18,10 @@ const News1: React.FC = () => {
           {/* Enhanced header with improved spacing and animations */}
           <header className="mb-16 text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-            Mazs AI User Interface Update
+            New ThinkLink development
             </h1>
             <p className="text-gray-400 text-base md:text-lg font-medium">
-              Published on January 09, 2025
+              Published on January 13, 2025
             </p>
           </header>
 
@@ -30,7 +30,7 @@ const News1: React.FC = () => {
             <div className="relative w-full max-w-3xl mx-auto">
               <img
                 src={pic1}
-                alt="Mazs AI"
+                alt="ThinkLink"
                 className="w-full h-64 md:h-80 object-cover rounded-xl shadow-2xl hover:shadow-blue-500/20 transition-shadow duration-300"
               />
             </div>
@@ -39,26 +39,26 @@ const News1: React.FC = () => {
           <div className="prose prose-lg prose-invert mx-auto">
             {/* Enhanced introduction paragraph */}
             <p className="text-xl md:text-2xl leading-relaxed mb-8 text-gray-200">
-                GMTStudio, the group develop the Mazs AI, are developing a new website user interface for Mazs AI and it's tools.
+                We designed a new user interface and more features to ThinkLink.
             </p>
 
             {/* Improved section headers with hover effects */}
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              What is Mazs AI?
+              What is ThinkLink ?
             </h2>
             <p className="mb-8 text-gray-300 leading-relaxed">
-                Mazs AI is a AI language based model develop by GMTStudio, the word Mazs comes from Mass, which means the weights and the powerful aspect of the AI, the reason why we change one s to z is because we want it to be unique.
+                ThinkLink is a powerful tools that allows user to create memory link to all things around them, from remembering Tasks, dates, important meetings, all in one application. what make this different is that you don't need to organize it yourself, do need to enter the date into the chart, no need to summarize your words into title, don't need to think about what is the date for next Monday, simply type what you want by using Natural language, it can generate and remind you if there is a task to do today !
             </p>
 
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              Key Points of the Updated UI
+              Key point for ThinkLink design
             </h2>
             {/* Enhanced list with hover effects and better spacing */}
             <ul className="space-y-4 mb-8 list-none">
               {[
-                "More user friendly interface",
-                "Improve the user experience",
-                "add more features that will be released soon"
+                "Powered by MazsAI - v1 thinklink model",
+                "more convience and easy to use",
+                "speak and create tasks"
               ].map((point, index) => (
                 <li key={index} className="flex items-center space-x-3 text-gray-300 hover:text-white transition-colors">
                   <span className="text-blue-500">•</span>
@@ -76,7 +76,7 @@ const News1: React.FC = () => {
               Looking Ahead
             </h2>
             <p className="mb-8 text-gray-300 leading-relaxed">
-                We are happy that we are finally getting rid of that old user interface, and we are looking forward to seeing the new one.
+                We are excited to share this newly developed tools with you.
             </p>
 
             <p className="text-gray-300 leading-relaxed">
@@ -92,7 +92,7 @@ const News1: React.FC = () => {
           </a>
           <a href="/news2">
           <button className ="border bg-black border-white text-white hover:bg-white hover:text-black hover:border-black rounded-lg px-4 py-3 ml-5 ">
-              Next Page - News 3
+              Next Page - News 2
           </button>
           </a>
         </div>

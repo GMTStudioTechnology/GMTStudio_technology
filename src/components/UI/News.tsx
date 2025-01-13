@@ -155,7 +155,7 @@ const HomePage: React.FC = () => {
       description:"We've also redesign ThinkLink UI ",
       category: 'Software Design',
       date: 'January 8, 2025',
-      href: '#',
+      href: '/news2',
     },
     {
       id: '3',

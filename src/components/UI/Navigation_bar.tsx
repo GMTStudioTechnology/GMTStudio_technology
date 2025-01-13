@@ -97,8 +97,8 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-20">
           <motion.div 
             className="flex-shrink-0 flex items-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.00 }}
+            whileTap={{ scale: 1.00 }}
           >
             <a href="/preview" className="flex items-center space-x-2">
               <img
