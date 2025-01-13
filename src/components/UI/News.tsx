@@ -162,7 +162,7 @@ const HomePage: React.FC = () => {
       title: 'GMTStudio Official Website v2',
       category: 'Website Development',
       date: 'January 7, 2025',
-      href: '#',
+      href: 'news3',
     },
     {
       id: '4',

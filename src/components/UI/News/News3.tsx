@@ -1,7 +1,7 @@
 import React from 'react';
 import pic1 from "../../assets/ThinkLink.png"
 import Navbar from '../../UI/Navigation_bar';
-const News2: React.FC = () => {
+const News3: React.FC = () => {
   return (
     <div >
     <Navbar/>
@@ -10,7 +10,7 @@ const News2: React.FC = () => {
             <ul>
                 <li><a href="/">GMTStudio</a></li>
                 <li><a href="/news">News</a></li>
-                <li>News 2 - ThinkLink development </li>
+                <li>News 3 - GMTStudio </li>
                 </ul>
         </div>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,10 +18,10 @@ const News2: React.FC = () => {
           {/* Enhanced header with improved spacing and animations */}
           <header className="mb-16 text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-            New ThinkLink development
+            GMTStudio official website v2
             </h1>
             <p className="text-gray-400 text-base md:text-lg font-medium">
-              Published on January 7, 2025
+              Published on January 6, 2025
             </p>
           </header>
 
@@ -39,26 +39,26 @@ const News2: React.FC = () => {
           <div className="prose prose-lg prose-invert mx-auto">
             {/* Enhanced introduction paragraph */}
             <p className="text-xl md:text-2xl leading-relaxed mb-8 text-gray-200">
-                We designed a new user interface and more features to ThinkLink.
+                We redesign the UI and UX of the official website of GMTStudio.
             </p>
 
             {/* Improved section headers with hover effects */}
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              What is ThinkLink ?
+              Why we want to change 
             </h2>
             <p className="mb-8 text-gray-300 leading-relaxed">
-                ThinkLink is a powerful tools that allows user to create memory link to all things around them, from remembering Tasks, dates, important meetings, all in one application. what make this different is that you don't need to organize it yourself, do need to enter the date into the chart, no need to summarize your words into title, don't need to think about what is the date for next Monday, simply type what you want by using Natural language, it can generate and remind you if there is a task to do today !
+                In 2024, we designed a website for our company - GMTStudio, to give inform about our company and our products. However, we think that the website is too laggy and the layout is not that good, so we decided to redesign a website.
             </p>
 
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              Key point for ThinkLink design
+              Key point for GMTStudio official website v2
             </h2>
             {/* Enhanced list with hover effects and better spacing */}
             <ul className="space-y-4 mb-8 list-none">
               {[
-                "Powered by MazsAI - v1 thinklink model",
-                "more convience and easy to use",
-                "speak and create tasks"
+                "A demo of Mazs AI v1 anatra ",
+                "more better interactive UI ",
+                "won't hurt our eyes"
               ].map((point, index) => (
                 <li key={index} className="flex items-center space-x-3 text-gray-300 hover:text-white transition-colors">
                   <span className="text-blue-500">•</span>
@@ -90,9 +90,9 @@ const News2: React.FC = () => {
             Back to News
           </button>
           </a>
-          <a href="/news3">
+          <a href="/news2">
           <button className ="border bg-black border-white text-white hover:bg-white hover:text-black hover:border-black rounded-lg px-4 py-3 ml-5 ">
-              Next Page - News 3
+              Next Page - News 4
           </button>
           </a>
         </div>
@@ -102,4 +102,4 @@ const News2: React.FC = () => {
   );
 };
 
-export default News2;
+export default News3;

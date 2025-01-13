@@ -9,6 +9,7 @@ import OnlineTools from "./components/UI/onlineTools"
 import News from "./components/UI/News";
 import News1 from "./components/UI/News/News1"
 import News2 from "./components/UI/News/News2"
+import News3 from "./components/UI/News/News3"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 function App() {
@@ -26,6 +27,7 @@ function App() {
           
           <Route path="/news1" element={<News1 />} />
           <Route path="/news2" element={<News2 />} />
+          <Route path="/news3" element={<News3 />} />
         </Routes>
       </div>
 
