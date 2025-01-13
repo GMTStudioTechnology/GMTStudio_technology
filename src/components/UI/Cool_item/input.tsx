@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown, Keyboard } from '@gravity-ui/icons'
+import { Plus, Globe, Microphone, Gear, ChevronUp, ChevronDown, Keyboard, FontCursor } from '@gravity-ui/icons'
 import data from './data.json'
 import { processWithNeuralNetwork } from './Neural'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -643,7 +643,7 @@ export default function ChatInput() {
                   className="p-1 text-white/80 hover:text-white transition-colors"
                   disabled={isThinking}
                 >
-                  <Circles5Random className="h-5 w-5" />
+                  <FontCursor className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
