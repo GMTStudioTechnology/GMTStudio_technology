@@ -2,6 +2,7 @@
 
 import { Plus, Globe, Microphone, Gear, Circles5Random, ChevronUp, ChevronDown, Keyboard } from '@gravity-ui/icons'
 import data from './data.json'
+import { processWithNeuralNetwork } from './Neural'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, stagger, useAnimate, AnimatePresence } from "framer-motion"
 import Meme1 from "../../assets/Meme.png"
@@ -192,9 +193,11 @@ export default function ChatInput() {
     }
 
     const randomIndex = Math.floor(Math.random() * responses.length);
+    const rawResponse = responses[randomIndex];
+    const processedResponse = processWithNeuralNetwork(rawResponse);
     return {
       type: 'text' as const,
-      text: responses[randomIndex]
+      text: processedResponse
     };
   }
 

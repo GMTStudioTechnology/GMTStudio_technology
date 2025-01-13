@@ -10,7 +10,7 @@ import News from "./components/UI/News";
 import News1 from "./components/UI/News/News1"
 import News2 from "./components/UI/News/News2"
 import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 function App() {
   return (
     <div className="App">
