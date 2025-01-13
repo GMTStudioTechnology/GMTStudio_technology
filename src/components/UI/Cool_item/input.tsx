@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus, Globe, Microphone, Gear, ChevronUp, ChevronDown, Keyboard, FontCursor, Function,TerminalLine, ClockFill } from '@gravity-ui/icons'
+import { Plus, Globe, Microphone, Gear, ChevronUp, ChevronDown, Keyboard, FontCursor, Function, TerminalLine, ClockFill } from '@gravity-ui/icons'
 import data from './data.json'
 import { processWithNeuralNetwork } from './Neural'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -37,7 +37,7 @@ const TextGenerateEffect = ({
                 delay: stagger(0.2),
             }
         );
-    }, );
+    },);
 
     return (
         <div className={`font-normal ${className || ''}`}>
@@ -66,107 +66,101 @@ interface ThinkingUIProps {
     onComplete: () => void;
 }
 
-
-interface ThinkingUIProps {
-  steps: string[];
-  onComplete: () => void;
-}
-
 const ThinkingUI: React.FC<ThinkingUIProps> = ({ steps, onComplete }) => {
-  const [displayedSteps, setDisplayedSteps] = useState<string[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState('');
-  const [textIndex, setTextIndex] = useState(0);
-  const typingSpeed = 7;
-  const [progress, setProgress] = useState(0);
+    const [displayedSteps, setDisplayedSteps] = useState<string[]>([]);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [displayedText, setDisplayedText] = useState('');
+    const [textIndex, setTextIndex] = useState(0);
+    const typingSpeed = 7;
+    const [progress, setProgress] = useState(0);
+  
+      useEffect(() => {
+          if (currentStepIndex < steps.length && textIndex < steps[currentStepIndex].length) {
+              const timeout = setTimeout(() => {
+                  setDisplayedText(prev => prev + steps[currentStepIndex][textIndex]);
+                  setTextIndex(prevIndex => prevIndex + 1);
+                setProgress((currentStepIndex * 100 + (textIndex * 100 / steps[currentStepIndex].length)) / steps.length);
+              }, typingSpeed);
+              return () => clearTimeout(timeout);
+          }
+    
+          if (currentStepIndex < steps.length && textIndex === steps[currentStepIndex].length) {
+              setDisplayedSteps(prev => [...prev, displayedText]);
+              setDisplayedText("");
+              setTextIndex(0);
+              setCurrentStepIndex(prev => prev + 1);
+            }
+    }, [currentStepIndex, steps, textIndex, typingSpeed, displayedText]);
+  
+      useEffect(() => {
+          if (currentStepIndex === steps.length) {
+              onComplete();
+          }
+      }, [currentStepIndex, steps, onComplete]);
+  
+      const getStepIcon = (index: number) => {
+          const icons = [Function, TerminalLine , ClockFill];
+          return icons[index % icons.length];
+      };
+    
+    return (
+        <motion.div
+            className="bg-black/90 rounded-lg p-4 my-3 border border-white/10 backdrop-blur-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
+            <div className="flex items-center gap-2 mb-3">
+                <div className="text-blue-400 font-semibold">Thinking...</div>
+            </div>
 
-  useEffect(() => {
-      if (currentStepIndex < steps.length && textIndex < steps[currentStepIndex].length) {
-          const timeout = setTimeout(() => {
-              setDisplayedText(prev => prev + steps[currentStepIndex][textIndex]);
-              setTextIndex(prevIndex => prevIndex + 1);
-              setProgress((currentStepIndex * 100 + (textIndex * 100 / steps[currentStepIndex].length)) / steps.length);
-          }, typingSpeed);
-          return () => clearTimeout(timeout);
-      }
+            <div className="w-full bg-white/10 h-1 rounded-full mb-4">
+                <motion.div
+                    className="h-full bg-blue-400 rounded-full"
+                    style={{ width: `${progress}%` }}
+                    transition={{ duration: 0.2 }}
+                />
+            </div>
 
-      if (currentStepIndex < steps.length && textIndex === steps[currentStepIndex].length) {
-          setDisplayedSteps(prev => [...prev, displayedText]);
-          setDisplayedText("");
-          setTextIndex(0);
-          setCurrentStepIndex(prev => prev + 1);
-      }
-  }, [currentStepIndex, steps, textIndex, typingSpeed, displayedText]);
+            <div className="space-y-3">
+                <AnimatePresence mode="wait">
+                    {displayedSteps.map((step, index) => {
+                        const Icon = getStepIcon(index);
+                        return (
+                            <motion.div
+                                key={index}
+                                className="flex items-start gap-3 text-white/90 font-mono text-sm"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <Icon className="w-4 h-4 mt-1 text-white/60" />
+                                <div className="flex-1">{step}</div>
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
 
-  useEffect(() => {
-      if (currentStepIndex === steps.length) {
-          onComplete();
-      }
-  }, [currentStepIndex, steps, onComplete]);
-
-  const getStepIcon = (index: number) => {
-      const icons = [Function, TerminalLine , ClockFill];
-      return icons[index % icons.length];
-  };
-
-  return (
-      <motion.div 
-          className="bg-black/90 rounded-lg p-4 my-3 border border-white/10 backdrop-blur-xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-      >
-          <div className="flex items-center gap-2 mb-3">
-              <div className="text-blue-400 font-semibold">Thinking...</div>
-          </div>
-
-          <div className="w-full bg-white/10 h-1 rounded-full mb-4">
-              <motion.div 
-                  className="h-full bg-blue-400 rounded-full"
-                  style={{ width: `${progress}%` }}
-                  transition={{ duration: 0.2 }}
-              />
-          </div>
-
-          <div className="space-y-3">
-              <AnimatePresence mode="wait">
-                  {displayedSteps.map((step, index) => {
-                      const Icon = getStepIcon(index);
-                      return (
-                          <motion.div
-                              key={index}
-                              className="flex items-start gap-3 text-white/90 font-mono text-sm"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3 }}
-                          >
-                              <Icon className="w-4 h-4 mt-1 text-white/60" />
-                              <div className="flex-1">{step}</div>
-                          </motion.div>
-                      );
-                  })}
-              </AnimatePresence>
-
-              {displayedText && (
-                  <motion.div 
-                      className="flex items-start gap-3 text-white/90 font-mono text-sm"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                  >
-                      {getStepIcon(currentStepIndex)({ className: "w-4 h-4 mt-1 text-white/60" })}
-                      <div className="flex-1">
-                          {displayedText}
-                          <motion.span
-                              className="inline-block w-2 h-4 bg-blue-400/50 ml-1"
-                              animate={{ opacity: [0, 1, 0] }}
-                              transition={{ duration: 1, repeat: Infinity }}
-                          />
-                      </div>
-                  </motion.div>
-              )}
-          </div>
-      </motion.div>
-  );
+                {displayedText && (
+                    <motion.div
+                        className="flex items-start gap-3 text-white/90 font-mono text-sm"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                    >
+                        {getStepIcon(currentStepIndex)({ className: "w-4 h-4 mt-1 text-white/60" })}
+                        <div className="flex-1">
+                            {displayedText}
+                            <motion.span
+                                className="inline-block w-2 h-4 bg-blue-400/50 ml-1"
+                                animate={{ opacity: [0, 1, 0] }}
+                                transition={{ duration: 1, repeat: Infinity }}
+                            />
+                        </div>
+                    </motion.div>
+                )}
+            </div>
+        </motion.div>
+    );
 };
 
 
@@ -178,8 +172,9 @@ interface Message {
     status: 'sent' | 'delivered' | 'read';
     timestamp: Date;
     thinking?: string[];
-    file?: File | null; // For file attachments
-    isThinkingUI?:boolean;
+    file?: File | null;
+    isThinkingUI?: boolean;
+    thinkingExpanded?: boolean;
 }
 
 interface Task {
@@ -193,19 +188,19 @@ const DIRECT_RESPONSES: Record<string, string> = {
     'hey': 'yallow! How can I help you?',
     '': 'Hola! ¿En puedo ayudarte?',
     'ciao': 'Ciao! Come posso aiutarti?',
-    'who are you ?':'I am Mazs AI, An AI that chat with you in a nonsense way. ',
-    'what is your purpose ?':'pass the butter ( pass )',
-    'who the fuck are you ?' : 'yourself',
-    "nothing":"(╯°□°)╯︵ ┻━┻ then why you ask ? ",
-    "uh I don't know":" (´･ω･`) are you joking with me right now ?",
-    "uh":"what ?",
-    "?":" (╯°□°)╯︵ ┻━┻ what ! type it out",
+    'who are you ?': 'I am Mazs AI, An AI that chat with you in a nonsense way. ',
+    'what is your purpose ?': 'pass the butter ( pass )',
+    'who the fuck are you ?': 'yourself',
+    "nothing": "(╯°□°)╯︵ ┻━┻ then why you ask ? ",
+    "uh I don't know": " (´･ω･`) are you joking with me right now ?",
+    "uh": "what ?",
+    "?": " (╯°□°)╯︵ ┻━┻ what ! type it out",
 
 };
 
 
 function generateThinkingSteps(userMessage: string): string[] {
-  const thinkingPhrases = data.AI?.thinking || [
+    const thinkingPhrases = data.AI?.thinking || [
         "Hmm...",
         "Let me see...",
         "Okay, so...",
@@ -217,7 +212,7 @@ function generateThinkingSteps(userMessage: string): string[] {
         "I wonder if...",
         "But then again..."
     ];
-    const numSteps = Math.floor(Math.random() * 3) + 2; // Random number of steps between 2 and 4
+    const numSteps = Math.floor(Math.random() * 3) + 2;
     const thinkingSteps: string[] = [];
     for (let i = 0; i < numSteps; i++) {
         const randomIndex = Math.floor(Math.random() * thinkingPhrases.length);
@@ -231,13 +226,13 @@ export default function ChatInput() {
     const [conversation, setConversation] = useState<Message[]>([])
     const [isThinking, setIsThinking] = useState(false)
     const [isExpanded, setIsExpanded] = useState(false)
-    const [isCollapsed, setIsCollapsed] = useState(true) // Changed initial state to true
+    const [isCollapsed, setIsCollapsed] = useState(true)
     const [, setThinkLinkTaskDescription] = useState('')
     const [tasks, setTasks] = useState<Task[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isAttachOpen, setIsAttachOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null) // Added file state
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const lastInteractionRef = useRef<number>(Date.now())
     const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -246,8 +241,7 @@ export default function ChatInput() {
     const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
-
-    const catMemes = [Meme1, Meme3, Meme2, Meme4,Meme5];
+    const catMemes = [Meme1, Meme3, Meme2, Meme4, Meme5];
 
     useEffect(() => {
         isExpandedRef.current = isExpanded
@@ -262,10 +256,10 @@ export default function ChatInput() {
             setIsCollapsed(false)
 
             collapseTimeoutRef.current = setTimeout(() => {
-                if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 0) { // Changed to 1000ms
+                if (!isExpandedRef.current && Date.now() - lastInteractionRef.current >= 0) {
                     setIsCollapsed(true)
                 }
-            }, 0) // Changed to 1000ms
+            }, 0)
         }
     }, [])
 
@@ -371,7 +365,7 @@ export default function ChatInput() {
             timestamp: new Date()
         };
 
-        setConversation([...conversation, userMessage]);
+        setConversation(prev => [...prev, userMessage]);
         setMessage('');
         setSelectedFile(null);
 
@@ -382,7 +376,7 @@ export default function ChatInput() {
         if (message.includes('@thinklink')) {
             const taskDescription = message.replace('@thinklink', '').trim();
             const dueTime = new Date().toLocaleTimeString();
-            setTasks([...tasks, { description: taskDescription, dueTime }]);
+            setTasks(prev => [...prev, { description: taskDescription, dueTime }]);
             setThinkLinkTaskDescription(taskDescription);
             setIsThinking(false);
             const botMessage: Message = {
@@ -392,7 +386,7 @@ export default function ChatInput() {
                 text: `I will remember to notify you that your task is due at ${dueTime}.`,
                 type: 'text'
             };
-            setConversation(prev => [
+             setConversation(prev => [
                 ...prev.map((msg, idx) =>
                     idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
                 ),
@@ -402,38 +396,40 @@ export default function ChatInput() {
         }
 
         // Update to 'delivered' status after 2 seconds
-        setTimeout(() => {
-            setConversation(prev =>
-                prev.map((msg, idx) =>
-                    idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
-                )
-            );
-        }, 2000);
-
-        // Update to 'read' status after another 2.5 seconds and start thinking
-        setTimeout(() => {
-            setConversation(prev =>
-                prev.map((msg, idx) =>
-                    idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
-                )
-            );
-
-            // Only start thinking after message is read
+          setTimeout(() => {
+              setConversation(prev =>
+                  prev.map((msg, idx) =>
+                      idx === prev.length - 1 ? { ...msg, status: 'delivered' as const } : msg
+                  )
+              );
+          }, 2000);
+    
+          // Update to 'read' status after another 2.5 seconds and start thinking
+           setTimeout(() => {
+              setConversation(prev =>
+                  prev.map((msg, idx) =>
+                      idx === prev.length - 1 ? { ...msg, status: 'read' as const } : msg
+                  )
+              );
+    
+              // Only start thinking after message is read
             setIsThinking(true);
 
             const { thinking, response } = getRandomResponse(message, selectedFile);
 
+
             const thinkingMessage: Message = {
-                 sender: 'bot',
+                sender: 'bot',
                 status: 'read',
                 timestamp: new Date(),
                 text: '',
                 type: 'text',
                 thinking: thinking,
-                isThinkingUI: true
+                isThinkingUI: true,
+                 thinkingExpanded: false,
             };
             setConversation(prev => [...prev, thinkingMessage]);
-            setTimeout(() => {
+             setTimeout(() => {
                 const botMessage: Message = {
                     sender: 'bot',
                     status: 'read',
@@ -447,15 +443,14 @@ export default function ChatInput() {
              }, thinking.length * 500 + 500);
 
 
-
         }, 2500);
     }
+
     const handleAttach = () => {
         setIsAttachOpen(!isAttachOpen);
     };
 
     const handleGlobe = () => {
-        // Example: Open a new tab with a default search engine
         window.open('/preview', '_blank');
     };
 
@@ -469,7 +464,6 @@ export default function ChatInput() {
                 mediaRecorder.stop();
             }
             setIsRecording(false);
-
             return;
         }
         try {
@@ -477,34 +471,31 @@ export default function ChatInput() {
             const recorder = new MediaRecorder(stream);
             setMediaRecorder(recorder);
             recorder.ondataavailable = (event) => {
-                if(event.data.size > 0) {
-                    setAudioChunks((prevChunks) => [...prevChunks, event.data])
-                }
-            };
-            recorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-                setAudioChunks([]);
-
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const botMessage: Message = {
-                    sender: 'bot',
-                    status: 'read',
-                    timestamp: new Date(),
-                    text: `[Audio Message]`,
+                 if (event.data.size > 0) {
+                     setAudioChunks((prevChunks) => [...prevChunks, event.data])
+                 }
+             };
+             recorder.onstop = () => {
+                 const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+                 setAudioChunks([]);
+                 const audioUrl = URL.createObjectURL(audioBlob);
+                 const botMessage: Message = {
+                     sender: 'bot',
+                     status: 'read',
+                     timestamp: new Date(),
+                     text: `[Audio Message]`,
                     type: 'text'
-                }
-
-                setConversation((prev) => [
+                 }
+                 setConversation((prev) => [
                     ...prev,
-                    botMessage,
-                ]);
-
-                const audioElement = new Audio(audioUrl);
-                audioElement.play()
-            }
+                     botMessage,
+                 ]);
+                  const audioElement = new Audio(audioUrl);
+                  audioElement.play()
+             }
             recorder.start();
             setIsRecording(true);
-        } catch(error) {
+        } catch (error) {
             console.error("Error accessing microphone", error);
         }
     };
@@ -543,10 +534,11 @@ export default function ChatInput() {
         handleCloseAttachMenu();
     };
 
-    const handleSettingAction = (action:string) => {
+    const handleSettingAction = (action: string) => {
         alert(`clicked ${action} button in settings`)
         handleCloseSettingsMenu();
     }
+
 
     if (isCollapsed && !isExpanded) {
         return (
@@ -598,7 +590,7 @@ export default function ChatInput() {
                     transition={{ duration: 0.3 }}
                 >
                     <form onSubmit={handleSubmit} className="flex flex-col">
-                        <AnimatePresence mode="wait">
+                         <AnimatePresence mode="wait">
                             {isExpanded && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
@@ -637,9 +629,16 @@ export default function ChatInput() {
                                                             transition={{ duration: 0.3 }}
                                                         />
                                                     ) : msg.sender === 'bot' && msg.isThinkingUI ? (
-                                                            <ThinkingUI steps={msg.thinking || []} onComplete={() => { }} />
-                                                    )
-                                                        :  msg.sender === 'bot' ? (
+                                                       <button onClick={() => {
+                                                          const newConversation = [...conversation];
+                                                           newConversation[idx] = { ...newConversation[idx], thinkingExpanded: !msg.thinkingExpanded}
+                                                           setConversation(newConversation)
+                                                        }} className="flex items-center">
+                                                          <div className="text-blue-400 font-semibold">
+                                                              {msg.thinkingExpanded ? 'Collapse Thinking' : 'Thinking Process'}
+                                                          </div>
+                                                         </button>
+                                                    ) : msg.sender === 'bot' ? (
                                                         <TextGenerateEffect
                                                             words={msg.text}
                                                             className="text-sm"
@@ -647,11 +646,14 @@ export default function ChatInput() {
                                                             duration={0.5}
                                                         />
                                                     ) : msg.file ? (
-                                                                <span className="text-sm">
-                                                                    Attached File: {msg.file.name}
-                                                                </span>
-                                                            ) : (
+                                                        <span className="text-sm">
+                                                            Attached File: {msg.file.name}
+                                                        </span>
+                                                    ) : (
                                                         <span className="text-sm">{msg.text}</span>
+                                                    )}
+                                                    {msg.sender === 'bot' && msg.thinking && msg.thinkingExpanded && (
+                                                        <ThinkingUI steps={msg.thinking} onComplete={() => { }} />
                                                     )}
                                                 </div>
                                                 {msg.sender === 'user' && (
@@ -673,7 +675,7 @@ export default function ChatInput() {
                                                 transition={{
                                                     duration: 0.5,
                                                     times: [0, 0.8, 0.9, 1],
-                                                    delay: 0, // Changed delay to 0
+                                                    delay: 0,
                                                 }}
                                             >
                                                 <div className="flex gap-1">
@@ -771,15 +773,15 @@ export default function ChatInput() {
                                                 <button onClick={handleCloseSettingsMenu} className="hover:bg-white/10 px-4 py-2 rounded-lg">
                                                     Close
                                                 </button>
-                                                  <button onClick={()=> handleSettingAction("settings")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                      Settings
-                                                  </button>
-                                                  <button onClick={()=> handleSettingAction("privacy")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                      Privacy
-                                                  </button>
-                                                  <button onClick={()=> handleSettingAction("security")}  className="hover:bg-white/10 px-4 py-2 rounded-lg">
-                                                      Security
-                                                  </button>
+                                                <button onClick={() => handleSettingAction("settings")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                    Settings
+                                                </button>
+                                                <button onClick={() => handleSettingAction("privacy")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                    Privacy
+                                                </button>
+                                                <button onClick={() => handleSettingAction("security")} className="hover:bg-white/10 px-4 py-2 rounded-lg">
+                                                    Security
+                                                </button>
 
                                             </div>
                                         </motion.div>
@@ -792,7 +794,7 @@ export default function ChatInput() {
                                 value={message}
                                 onChange={(e) => {
                                     setMessage(e.target.value)
-                                    if (!isExpanded) {
+                                     if (!isExpanded) {
                                         resetCollapseTimeout()
                                     }
                                 }}
