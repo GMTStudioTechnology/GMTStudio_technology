@@ -12,6 +12,7 @@ import News2 from "./components/UI/News/News2"
 import News3 from "./components/UI/News/News3"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import Computer from "./components/UI/Hidden/Computer"
 function App() {
   return (
     <div className="App">
@@ -23,6 +24,7 @@ function App() {
           <Route path="/preview" element={<Preview />} />
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
+          <Route path="/computer" element={<Computer />} />
           <Route path="/news" element={<News />} />
           
           <Route path="/news1" element={<News1 />} />
