@@ -3,7 +3,7 @@ import { Twitter, Linkedin, ArrowUpRight, CalendarDays, ChevronRight } from 'luc
 import pic from '../assets/MazsAI.png';
 import pic1 from '../assets/ThinkLink.png';
 import pic2 from '../assets/pic1.png';
-import Navbar from '../UI/Navigation_bar';
+import Navbar from './Navigation_bar';
 
 // Types
 type NewsCardSize = 'large' | 'wide' | 'default';

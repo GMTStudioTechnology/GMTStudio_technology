@@ -1,6 +1,6 @@
 import React from 'react';
 import pic1 from "../../assets/ThinkLink.png"
-import Navbar from '../../UI/Navigation_bar';
+import Navbar from '../../layout/Navigation_bar';
 const News2: React.FC = () => {
   return (
     <div >

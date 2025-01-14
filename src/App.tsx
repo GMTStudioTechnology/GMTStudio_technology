@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainPage from "./components/layout/MainPage";
-import Projects from "./components/UI/Projects"; // Importing Projects component
-import Preview from "./components/layout/preview";
-import AboutUs from "../src/components/UI/AboutUs";
+import Projects from "./components/layout/Projects"; // Importing Projects component
+
+import AboutUs from "./components/layout/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
-import OnlineTools from "./components/UI/onlineTools"
-import News from "./components/UI/News";
+import OnlineTools from "./components/layout/onlineTools"
+import News from "./components/layout/News";
 import News1 from "./components/UI/News/News1"
 import News2 from "./components/UI/News/News2"
 import News3 from "./components/UI/News/News3"
@@ -21,7 +21,6 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage/>} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/preview" element={<Preview />} />
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
           <Route path="/news" element={<News />} />

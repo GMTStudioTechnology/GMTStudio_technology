@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import pic1 from '../../assets/pic1.png';
-import pic2 from '../../assets/pic2.jpeg';
-import pic3 from '../../assets/pic3.jpeg';
+import pic1 from "../../assets/pic1.png"
+import pic2 from "../../assets/pic2.jpeg";
+import pic3 from "../../assets/pic3.jpeg";
 import pic4 from "../../assets/pic4.jpeg";
 import pic5 from "../../assets/pic5.jpeg";
-
-// Text Generation Effect Component remains the same
 const TextGenerateEffect: React.FC<{ text: string }> = ({ text }) => {
     const [displayedText, setDisplayedText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,7 +27,6 @@ const TextGenerateEffect: React.FC<{ text: string }> = ({ text }) => {
     );
 };
 
-// Highlight Component remains the same
 const Highlight: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <motion.span
@@ -82,10 +79,10 @@ const data: CardData[] = [
         src: pic3,
     },
     {
-      category: "User Experience",
-      title: <>Designing intuitive interfaces for seamless <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>interaction</a></>,
-      src: pic4,
-  },
+        category: "User Experience",
+        title: <>Designing intuitive interfaces for seamless <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>interaction</a></>,
+        src: pic4,
+    },
     {
         category: "Sustainability",
         title: "Innovating for a greener, more sustainable future",
@@ -106,7 +103,7 @@ const Card: React.FC<{ card: CardData; index: number }> = React.memo(({ card, in
 
     return (
         <motion.div
-            className="relative flex-shrink-0 w-80 h-96 mx-3 rounded-2xl overflow-hidden cursor-pointer"
+            className="relative flex-shrink-0 w-[340px] h-[450px] mx-4 rounded-3xl overflow-hidden cursor-pointer"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
@@ -120,25 +117,24 @@ const Card: React.FC<{ card: CardData; index: number }> = React.memo(({ card, in
                 animate={controls}
             />
             <motion.div
-                className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
             />
             <motion.div
-                className="absolute bottom-0 p-6 text-white"
+                className="absolute bottom-0 p-8 text-white"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
             >
-                <p className="text-sm font-medium mb-2 text-gray-200">{card.category}</p>
-                <h3 className="text-2xl font-bold leading-tight">{card.title}</h3>
+                <p className="text-lg font-medium mb-3 text-gray-200">{card.category}</p>
+                <h3 className="text-3xl font-bold leading-tight">{card.title}</h3>
             </motion.div>
         </motion.div>
     );
 });
 
-// InfiniteCarousel component remains the same
 const InfiniteCarousel: React.FC = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -244,11 +240,11 @@ const InfiniteCarousel: React.FC = () => {
 
 const GMTStudioCarousel: React.FC = () => {
     return (
-        <div className="pt-1 bg-black text-white pb-24">
+        <div className="pt-1 bg-black text-white pb-32">
             <main>
                 <div className="w-full">
-                    <div className="max-w-7xl mx-auto px-4">
-                        <div className="text-5xl font-bold mb-12 text-center flex flex-col items-center gap-2 ">
+                    <div className="max-w-8xl mx-auto px-4">
+                        <div className="text-6xl font-bold mb-16 text-center flex flex-col items-center gap-3">
                             <div className=''>
                                 <TextGenerateEffect text="Discover What's Possible in" />
                             </div>

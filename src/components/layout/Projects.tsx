@@ -5,7 +5,7 @@ import ThinkLink from "../assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
 import Video from "../assets/A.mov";
 import Video2 from "../assets/B.mov"
-import Vol from "../UI/MainPage/VelocityScroll"
+import Vol from "./VelocityScroll"
 interface ProjectSectionProps {
   title: string;
   description: string;

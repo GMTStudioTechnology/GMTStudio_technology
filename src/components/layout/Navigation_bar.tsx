@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
   const [searchResults, setSearchResults] = useState<NavigationItem[]>([]);
 
   const searchSuggestions: NavigationItem[] = [
-    { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
+    { name: "Home", href: "/", icon: <House className="w-5 h-5" /> },
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
     // Add any additional search suggestions here
   ];
   const navigation = [
-    { name: "Home", href: "/preview", icon: <House className="w-5 h-5" /> },
+    { name: "Home", href: "/", icon: <House className="w-5 h-5" /> },
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
@@ -100,7 +100,7 @@ const Navbar: React.FC = () => {
             whileHover={{ scale: 1.00 }}
             whileTap={{ scale: 1.00 }}
           >
-            <a href="/preview" className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2">
               <img
                 src={GMTLogo}
                 alt="GMTStudio Logo"

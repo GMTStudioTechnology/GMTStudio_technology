@@ -1,6 +1,6 @@
 import React from 'react';
 import pic1 from "../../assets/MazsAI.png"
-import Navbar from '../../UI/Navigation_bar';
+import Navbar from '../../layout/Navigation_bar';
 const News1: React.FC = () => {
   return (
     <div >

@@ -1,4 +1,4 @@
-import Navbar from "../UI/Navigation_bar";
+import Navbar from "./Navigation_bar";
 
 
 const OnlineTools: React.FC = () => {

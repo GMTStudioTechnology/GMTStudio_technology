@@ -451,7 +451,7 @@ export default function ChatInput() {
     };
 
     const handleGlobe = () => {
-        window.open('/preview', '_blank');
+        window.open('/', '_blank');
     };
 
     const handleGear = () => {
