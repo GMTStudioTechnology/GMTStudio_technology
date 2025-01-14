@@ -83,7 +83,7 @@ const data: CardData[] = [
     },
     {
       category: "User Experience",
-      title: <>Designing intuitive interfaces for seamless <a href="/computer" style={{ textDecoration: 'none', color: 'inherit' }}>interaction</a></>,
+      title: <>Designing intuitive interfaces for seamless <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>interaction</a></>,
       src: pic4,
   },
     {
