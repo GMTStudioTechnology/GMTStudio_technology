@@ -10,6 +10,7 @@ import News from "./components/layout/News";
 import News1 from "./components/UI/News/News1"
 import News2 from "./components/UI/News/News2"
 import News3 from "./components/UI/News/News3"
+import News4 from "./components/UI/News/News4"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/news1" element={<News1 />} />
           <Route path="/news2" element={<News2 />} />
           <Route path="/news3" element={<News3 />} />
+          <Route path="/news4" element={<News4 />} />
         </Routes>
       </div>
 
