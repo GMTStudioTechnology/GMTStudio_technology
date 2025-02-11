@@ -10,7 +10,7 @@ import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
 import Meme4 from "../../assets/Meme_3.png"
 import Meme5 from "../../assets/Meme_4.jpg"
-
+import DIRECT_RESPONSES from './Direct_responses'
 const TextGenerateEffect = ({
   words,
   className,
@@ -75,21 +75,6 @@ interface Task {
   dueTime: string;
 }
 
-const DIRECT_RESPONSES: Record<string, string> = {
-  'hello': 'Hello! How can I help you?',
-  'hi': 'hai ya! How can I help you?',
-  'hey': 'yallow! How can I help you?',
-  '': 'Hola! ¿En puedo ayudarte?',
-  'ciao': 'Ciao! Come posso aiutarti?',
-  'who are you ?':'I am Mazs AI, An AI that chat with you in a nonsense way. ',
-  'what is your purpose ?':'pass the butter ( pass )',
-  'who the fuck are you ?' : 'yourself',
-  "nothing":"(╯°□°)╯︵ ┻━┻ then why you ask ? ",
-  "uh I don't know":" (´･ω･`) are you joking with me right now ?",
-  "uh":"what ?",
-  "?":" (╯°□°)╯︵ ┻━┻ what ! type it out", 
-
-};
 
 export default function ChatInput() {
   const [message, setMessage] = useState<string>('')

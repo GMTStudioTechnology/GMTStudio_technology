@@ -1,6 +1,6 @@
 "use client";
 
-import  { useRef, FC, ReactNode } from "react";
+import { useRef, FC, ReactNode, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 
 interface IntroProps {
@@ -10,15 +10,23 @@ interface IntroProps {
 
 const Intro: FC<IntroProps> = ({ text, className = "" }) => {
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 768);
+    }
+  }, []);
+
   const { scrollYProgress } = useScroll({
-    target: targetRef,
+    target: isMobile ? undefined : targetRef,
   });
-  
+
   const words = text.split(" ");
 
   return (
-    <div 
-      ref={targetRef} 
+    <div
+      ref={!isMobile ? targetRef : null}
       className={`relative z-0 h-[150vh] ${className}`}
     >
       <div className="sticky top-0 mx-auto flex h-[50%] max-w-4xl items-center bg-transparent px-[1rem] py-[5rem]">
@@ -27,9 +35,9 @@ const Intro: FC<IntroProps> = ({ text, className = "" }) => {
             const start = i / words.length;
             const end = start + 1 / words.length;
             return (
-              <Word 
-                key={i} 
-                progress={scrollYProgress} 
+              <Word
+                key={i}
+                progress={scrollYProgress}
                 range={[start, end]}
               >
                 {word}

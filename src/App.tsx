@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainPage from "./components/layout/MainPage";
 import Projects from "./components/layout/Projects"; // Importing Projects component
-
+import A from "./components/UI/Hidden/a"
 import AboutUs from "./components/layout/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
@@ -25,7 +25,7 @@ function App() {
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
           <Route path="/news" element={<News />} />
-          
+          <Route path="/a" element={<A />} />
           <Route path="/news1" element={<News1 />} />
           <Route path="/news2" element={<News2 />} />
           <Route path="/news3" element={<News3 />} />

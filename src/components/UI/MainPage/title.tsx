@@ -98,9 +98,11 @@ const SparklesCore = ({
 export default function SparklesPreview() {
   return (
     <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
-      <div>      <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20 ">
+      <div>      
+        <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative">
         GMTStudio • tech
-      </h1></div>
+      </h1>
+      </div>
  
       <div className="w-full max-w-3xl h-40 relative">
         {/* Gradients */}
@@ -114,7 +116,7 @@ export default function SparklesPreview() {
           background="transparent"
           minSize={0.4}
           maxSize={1}
-          particleDensity={1200}
+          particleDensity={3500}
           className="w-full h-full"
           particleColor="#FFFFFF"
         />

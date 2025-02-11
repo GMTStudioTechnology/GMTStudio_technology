@@ -39,7 +39,7 @@ const TextGenerateEffect = ({
         delay: stagger(0.2),
       }
     );
-  }, [animate, duration, filter, scope.current]);
+  }, );
 
   return (
     <div className={`font-normal ${className || ''}`}>
