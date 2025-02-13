@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
     { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
     { name: "Mazs", href: "/news1", icon: <Picture className="w-5 h-5" /> },
-    // Add any additional search suggestions here
+    { name  : "Paper Trading", href: "https://paper-trading-simulator.vercel.app/", icon: <Picture className="w-5 h-5" /> },
   ];
   const navigation = [
     { name: "Home", href: "/", icon: <House className="w-5 h-5" /> },
