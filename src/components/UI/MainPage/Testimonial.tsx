@@ -200,9 +200,9 @@ export const Products: React.FC = () => {
       src: pic3,
     },
     {
-      quote: "This project is still a empty shell, we are trying our best to squeeze the maxium of our brain to figure it out what to put here...",
-      name: "(´;ω;`) under construction",
-      designation: "Still under construction",
+      quote: "((꜆꜄꜆ ˙꒳˙)꜆꜄꜆ｵﾗｵﾗｵﾗｵﾗ paper trading",
+      name: "Trading simulator",
+      designation: "oh ? ",
       src: pic4,
     },
     {
