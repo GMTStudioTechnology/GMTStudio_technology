@@ -147,7 +147,7 @@ const HomePage: React.FC = () => {
         "The Paper trading simulator is now available for all users",
       category: 'projects',
       date: 'Feb 13, 2025',
-      href: '/news1',
+      href: '/news5',
     },
     {
       id: '2',

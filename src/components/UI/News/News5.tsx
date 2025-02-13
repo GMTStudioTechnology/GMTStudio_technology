@@ -1,7 +1,7 @@
 import React from 'react';
 import pic1 from "../../assets/ThinkLink.png"
 import Navbar from '../../layout/Navigation_bar';
-const News3: React.FC = () => {
+const News5: React.FC = () => {
   return (
     <div >
     <Navbar/>
@@ -10,7 +10,7 @@ const News3: React.FC = () => {
             <ul>
                 <li><a href="/">GMTStudio</a></li>
                 <li><a href="/news">News</a></li>
-                <li>News 3 - GMTStudio official website </li>
+                <li>News 5 - New project announced </li>
                 </ul>
         </div>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,10 +18,10 @@ const News3: React.FC = () => {
           {/* Enhanced header with improved spacing and animations */}
           <header className="mb-16 text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-            GMTStudio official website v2
+            Paper Trading 
             </h1>
             <p className="text-gray-400 text-base md:text-lg font-medium">
-              Published on January 6, 2025
+              Published on Feb 13, 2025
             </p>
           </header>
 
@@ -39,26 +39,25 @@ const News3: React.FC = () => {
           <div className="prose prose-lg prose-invert mx-auto">
             {/* Enhanced introduction paragraph */}
             <p className="text-xl md:text-2xl leading-relaxed mb-8 text-gray-200">
-                We redesign the UI and UX of the official website of GMTStudio.
+                We are happy to announce that the new project - trading simulator is coming soon, currently we are giving some of our user to use.
             </p>
 
             {/* Improved section headers with hover effects */}
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              Why we want to change 
+              Why we want to do that
             </h2>
             <p className="mb-8 text-gray-300 leading-relaxed">
-                In 2024, we designed a website for our company - GMTStudio, to give inform about our company and our products. However, we think that the website is too laggy and the layout is not that good, so we decided to redesign a website.
+                Make someone who want to learn how to trade can play without losing their real money.
             </p>
 
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
-              Key point for GMTStudio official website v2
+              How are we going to do that 
             </h2>
             {/* Enhanced list with hover effects and better spacing */}
             <ul className="space-y-4 mb-8 list-none">
               {[
-                "A demo of Mazs AI v1 anatra ",
-                "more better interactive UI ",
-                "won't hurt our eyes"
+                "I don't know ! ",
+                "maybe when the project is ready you will know",
               ].map((point, index) => (
                 <li key={index} className="flex items-center space-x-3 text-gray-300 hover:text-white transition-colors">
                   <span className="text-blue-500">•</span>
@@ -69,7 +68,7 @@ const News3: React.FC = () => {
 
             {/* Enhanced blockquote with subtle animation */}
             <blockquote className="border-l-4 border-blue-500 pl-6 py-4 my-8 italic bg-blue-500/5 rounded-r-lg hover:bg-blue-500/10 transition-colors">
-              <p className="text-gray-200">"Please notice that the development will last for about a month or a few, and the AI tools ( features ) will be in beta for everyone. </p>
+              <p className="text-gray-200">"Please notice that the development will last for about a month or a few.</p>
             </blockquote>
 
             <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text hover:scale-105 transition-transform">
@@ -90,9 +89,9 @@ const News3: React.FC = () => {
             Back to News
           </button>
           </a>
-          <a href="/news4">
+          <a href="/news6">
           <button className ="border bg-black border-white text-white hover:bg-white hover:text-black hover:border-black rounded-lg px-4 py-3 ml-5 ">
-              Next Page - News 4
+              Next Page - News 6
           </button>
           </a>
         </div>
@@ -102,4 +101,4 @@ const News3: React.FC = () => {
   );
 };
 
-export default News3;
+export default News5;

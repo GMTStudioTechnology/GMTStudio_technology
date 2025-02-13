@@ -89,7 +89,7 @@ const News4: React.FC = () => {
             Back to News
           </button>
           </a>
-          <a href="/news2">
+          <a href="/news5">
           <button className ="border bg-black border-white text-white hover:bg-white hover:text-black hover:border-black rounded-lg px-4 py-3 ml-5 ">
               Next Page - News 5
           </button>
