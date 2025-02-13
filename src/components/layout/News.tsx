@@ -142,6 +142,15 @@ const HomePage: React.FC = () => {
   const featuredNews: NewsItem[] = [
     {
       id: '1',
+      title: 'New Projects Announced',
+      description:
+        "The Paper trading simulator is now available for all users",
+      category: 'projects',
+      date: 'Feb 13, 2025',
+      href: '/news1',
+    },
+    {
+      id: '2',
       title: 'Mazs AI User Interface Update',
       description:
         "We've redesign our user interface to provide better experience",
@@ -150,7 +159,7 @@ const HomePage: React.FC = () => {
       href: '/news1',
     },
     {
-      id: '2',
+      id: '3',
       title: 'Think Link Development',
       description:"We've also redesign ThinkLink UI ",
       category: 'Software Design',
@@ -158,14 +167,14 @@ const HomePage: React.FC = () => {
       href: '/news2',
     },
     {
-      id: '3',
+      id: '4',
       title: 'GMTStudio Official Website v2',
       category: 'Website Development',
       date: 'January 7, 2025',
       href: '/news3',
     },
     {
-      id: '4',
+      id: '5',
       title: 'Mazs AI Beta Release',
       category: 'AI',
       date: 'January 10, 2025',
