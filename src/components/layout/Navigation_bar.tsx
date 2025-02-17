@@ -27,8 +27,7 @@ const Navbar: React.FC = () => {
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
-    { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
-    { name: "Mazs", href: "/news1", icon: <Picture className="w-5 h-5" /> },
+    { name: "News", href: "https://gmt-studio-blog.vercel.app/", icon: <Picture className="w-5 h-5" /> },
     { name  : "Paper Trading", href: "https://paper-trading-simulator.vercel.app/", icon: <Picture className="w-5 h-5" /> },
   ];
   const navigation = [
@@ -36,7 +35,7 @@ const Navbar: React.FC = () => {
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
     { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
-    { name: "News", href: "/news", icon: <Picture className="w-5 h-5" /> },
+    { name: "News", href: "https://gmt-studio-blog.vercel.app/", icon: <Picture className="w-5 h-5" /> },
     
   ];
 
