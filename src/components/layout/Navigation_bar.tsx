@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
     { name: "Home", href: "/", icon: <House className="w-5 h-5" /> },
     { name: "About Us", href: "/aboutus", icon: <Server className="w-5 h-5" /> },
     { name: "Projects", href: "/projects", icon: <CircleInfo className="w-5 h-5" /> },
-    { name: "Online Tools", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
+    { name: "((꜆꜄꜆ ˙꒳˙)꜆꜄꜆ｵﾗｵﾗｵﾗｵﾗ", href: "/onlinetools", icon: <Envelope className="w-5 h-5" /> },
     { name: "News", href: "https://gmt-studio-blog.vercel.app/", icon: <Picture className="w-5 h-5" /> },
     
   ];
@@ -54,6 +54,7 @@ const Navbar: React.FC = () => {
         setSearchFocused(false);
       }
     };
+    
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
