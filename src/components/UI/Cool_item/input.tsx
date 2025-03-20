@@ -10,6 +10,8 @@ import Meme2 from "../../assets/Meme_1.png"
 import Meme3 from "../../assets/Meme_2.png"
 import Meme4 from "../../assets/Meme_3.png"
 import Meme5 from "../../assets/Meme_4.jpg"
+import Meme6 from "../../assets/Meme_5.jpg"
+import Meme7 from "../../assets/Meme_6.jpg"
 import DIRECT_RESPONSES from './Direct_responses'
 const TextGenerateEffect = ({
   words,
@@ -96,7 +98,7 @@ export default function ChatInput() {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
-  const catMemes = [Meme1, Meme3, Meme2, Meme4,Meme5];
+  const catMemes = [Meme1, Meme3, Meme2, Meme4,Meme5, Meme6, Meme7];
 
   useEffect(() => {
     isExpandedRef.current = isExpanded

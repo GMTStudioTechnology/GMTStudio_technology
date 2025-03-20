@@ -6,6 +6,7 @@ import launch2025 from "../../components/assets/pic1.png";
 import WebsiteDEV from "../../components/assets/MazsAI.png";
 import Found from "../../components/assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
+
 interface TimelineEntry {
   title: string;
   date?: string;
@@ -80,7 +81,6 @@ const data: TimelineEntry[] = [
             <h4 className="font-bold mb-4">Team Expansion</h4>
             <ul className="space-y-3 text-sm">
               <li>find few more team members </li>
-
               <li></li>
             </ul>
           </div>
@@ -120,13 +120,13 @@ const data: TimelineEntry[] = [
 
   {
     title: "2025 Q1",
-    date: "January 2024",
+    date: "January 2025", // Fixed the date from 2024 to 2025
     category: "official website design v2",
     content: (
       <div className="space-y-6">
         <img 
           src={launch2025}
-          alt="2024 Launch" 
+          alt="2025 Launch" // Updated alt from 2024 to 2025
           className="rounded-lg w-full object-cover"
         />
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -174,6 +174,7 @@ export const Timeline = () => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0); // Track current active section
 
   useEffect(() => {
     if (ref.current) {
@@ -182,7 +183,34 @@ export const Timeline = () => {
     }
   }, [ref]);
 
-const { scrollYProgress } = useScroll({
+  // Create individual scroll observers for each timeline item
+  useEffect(() => {
+    const sections = document.querySelectorAll('.timeline-section');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = parseInt(entry.target.getAttribute('data-index') || '0');
+          setActiveIndex(index);
+        }
+      });
+    }, { 
+      threshold: 0.3, // Trigger when 30% of the section is visible
+      rootMargin: '-20% 0px -20% 0px' // Adjust the margin to control when section is considered in view
+    });
+    
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+    
+    return () => {
+      sections.forEach(section => {
+        observer.unobserve(section);
+      });
+    };
+  }, []);
+
+  const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start 0%", "end 100%"],
   });
@@ -192,77 +220,84 @@ const { scrollYProgress } = useScroll({
 
   return (
     <div>
-    <Navbar/>
-    <div className="w-full bg-white dark:bg-neutral-950 font-sans md:px-10 mt-12" ref={containerRef}>
-      <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
+      <Navbar/>
+      <div className="w-full bg-white dark:bg-neutral-950 font-sans md:px-10 mt-12" ref={containerRef}>
+        <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
           <div className="max-w-3xl">
-          <h2 className="text-4xl md:text-6xl font-bold mb-8 text-black dark:text-white">
-            About US
-          </h2>
-          <p className="text-white text-xl leading-relaxed">
-            We are a bunch of student who want to enhance the user experience quality to perfect, and we also want to make some games and software to improve the whole industry.
-          </p>
-        </div>
-      </div>
-
-      <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
-        {data.map((item, index) => (
-          <div key={index} className="flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-white dark:bg-black flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 p-2" />
-              </div>
-              <div className="hidden md:block md:pl-20">
-                <h3 className={`text-4xl font-bold ${scrollYProgress.get() >= (index / data.length) && scrollYProgress.get() < ((index + 1) / data.length) ? 'text-white' : 'text-neutral-500'} dark:text-neutral-500`}>
-                  {item.title}
-                </h3>
-                {item.date && (
-                  <p className="text-sm text-neutral-400 mt-1">{item.date}</p>
-                )}
-                {item.category && (
-                  <span className="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm mt-2">
-                    {item.category}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="relative pl-20 pr-4 md:pl-4 w-full">
-              <div className="md:hidden mb-6">
-                <h3 className="text-2xl font-bold text-neutral-500 dark:text-neutral-500">
-                  {item.title}
-                </h3>
-                {item.date && (
-                  <p className="text-sm text-neutral-400 mt-1">{item.date}</p>
-                )}
-                {item.category && (
-                  <span className="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm mt-2">
-                    {item.category}
-                  </span>
-                  
-                )}
-              </div>
-                
-              {item.content}
-            </div>
+            <h2 className="text-4xl md:text-6xl font-bold mb-8 text-black dark:text-white">
+              About US
+            </h2>
+            <p className="text-gray-700 dark:text-white text-xl leading-relaxed">
+              We are a bunch of student who want to enhance the user experience quality to perfect, and we also want to make some games and software to improve the whole industry.
+            </p>
           </div>
-        ))}
+        </div>
 
-        <div
-          style={{
-            height: height + "px",
-          }}
-          className="absolute md:left-8 left-8 top-0 overflow-hidden w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-neutral-200 dark:via-neutral-700 to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"
-        >
-          <motion.div
+        <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
+          {data.map((item, index) => (
+            <div 
+              key={index} 
+              className="timeline-section flex justify-start pt-10 md:pt-40 md:gap-10"
+              data-index={index}
+            >
+              <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+                <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-white dark:bg-black flex items-center justify-center">
+                  <div className={`h-4 w-4 rounded-full ${activeIndex === index ? 'bg-blue-500' : 'bg-neutral-200 dark:bg-neutral-800'} border border-neutral-300 dark:border-neutral-700 p-2 transition-colors duration-300`} />
+                </div>
+                <div className="hidden md:block md:pl-20">
+                  <h3 className={`text-4xl font-bold ${activeIndex === index ? 'text-blue-500' : 'text-neutral-500'} dark:text-neutral-500 transition-colors duration-300`}>
+                    {item.title}
+                  </h3>
+                  {item.date && (
+                    <p className={`text-sm ${activeIndex === index ? 'text-gray-800 dark:text-gray-300' : 'text-neutral-400'} mt-1 transition-colors duration-300`}>
+                      {item.date}
+                    </p>
+                  )}
+                  {item.category && (
+                    <span className={`inline-block px-3 py-1 ${activeIndex === index ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'} rounded-full text-sm mt-2 transition-colors duration-300`}>
+                      {item.category}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="relative pl-20 pr-4 md:pl-4 w-full">
+                <div className="md:hidden mb-6">
+                  <h3 className={`text-2xl font-bold ${activeIndex === index ? 'text-blue-500' : 'text-neutral-500'} dark:text-neutral-500 transition-colors duration-300`}>
+                    {item.title}
+                  </h3>
+                  {item.date && (
+                    <p className={`text-sm ${activeIndex === index ? 'text-gray-800 dark:text-gray-300' : 'text-neutral-400'} mt-1 transition-colors duration-300`}>
+                      {item.date}
+                    </p>
+                  )}
+                  {item.category && (
+                    <span className={`inline-block px-3 py-1 ${activeIndex === index ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'} rounded-full text-sm mt-2 transition-colors duration-300`}>
+                      {item.category}
+                    </span>
+                  )}
+                </div>
+                  
+                {item.content}
+              </div>
+            </div>
+          ))}
+
+          <div
             style={{
-              height: heightTransform,
-              opacity: opacityTransform,
+              height: height + "px",
             }}
-            className="absolute inset-x-0 top-0 w-[2px] bg-gradient-to-t from-purple-500 via-blue-500 to-transparent from-[0%] via-[10%] rounded-full"
-          />
+            className="absolute md:left-8 left-8 top-0 overflow-hidden w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-neutral-200 dark:via-neutral-700 to-transparent to-[99%] [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)]"
+          >
+            <motion.div
+              style={{
+                height: heightTransform,
+                opacity: opacityTransform,
+              }}
+              className="absolute inset-x-0 top-0 w-[2px] bg-gradient-to-t from-purple-500 via-blue-500 to-transparent from-[0%] via-[10%] rounded-full"
+            />
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };
