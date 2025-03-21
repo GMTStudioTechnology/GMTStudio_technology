@@ -6,6 +6,7 @@ import Navbar from "./Navigation_bar";
 import Video from "../assets/A.mov";
 import Video2 from "../assets/B.mov"
 import Vol from "./VelocityScroll"
+import ZenithNet from "../assets/ZenithNet.png"
 interface ProjectSectionProps {
   title: string;
   description: string;
@@ -199,7 +200,19 @@ const Projects = () => {
       category: "Productivity",
       features: ["Real-time Sync", "Smart Workflows", "Team Analytics"],
       video:Video2
+    },
+    {
+      title: "ZenithNet",
+      subtitle: "Share • Discover • Connect",
+      description: "A social media platform that connects you with the world",
+      image: ZenithNet,
+      link: "https://zenith-net.vercel.app/",
+      backgroundColor: "#f5f5f7",
+      textColor: "black",
+      category: "Web Development",
+      features: ["platform", "Social Media", "Mobile Responsive"],
     }
+
   ];
 
   return (
