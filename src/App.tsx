@@ -6,7 +6,7 @@ import AboutUs from "./components/layout/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/layout/onlineTools"
-
+import './app.css'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
