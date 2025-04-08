@@ -4,7 +4,6 @@ import Navbar from "../../components/layout/Navigation_bar";
 
 const GateE13 = () => {
   const [showMoreDescription, setShowMoreDescription] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   return (
     <div className="bg-black text-white min-h-screen font-sans">
@@ -13,31 +12,12 @@ const GateE13 = () => {
         <Navbar />
         <div className="container mx-auto px-4 pt-16">
           <div className="flex justify-between items-center">
-            <div className="md:hidden">
-              <button 
-                className="text-xl p-2" 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? "✕" : "☰"}
-              </button>
-            </div>
+
           </div>
         </div>
       </div>
       
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-black border-b border-gray-800 py-4 shadow-lg">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col space-y-4">
-              <a href="#" className="hover:text-green-400 transition-colors duration-300">Store</a>
-              <a href="#" className="hover:text-green-400 transition-colors duration-300">Community</a>
-              <a href="#" className="hover:text-green-400 transition-colors duration-300">About</a>
-              <a href="#" className="hover:text-green-400 transition-colors duration-300">Support</a>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Game Title and Main Content */}
       <div className="container mx-auto px-4 py-8">
