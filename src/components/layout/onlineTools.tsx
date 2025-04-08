@@ -63,7 +63,7 @@ const GateE13 = () => {
                       <span className="ml-2">▶</span>
                     </button>
                     <div className="bg-black/70 py-1 px-4 rounded-sm border border-gray-700">
-                      <span className="text-white">Release: April 7, 2025</span>
+                      <span className="text-white">Release:2026(?</span>
                     </div>
                   </div>
                 </div>
