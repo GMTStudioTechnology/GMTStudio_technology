@@ -6,6 +6,7 @@ import AboutUs from "./components/layout/AboutUs";
 //import AI from "./components/UI/Cool_item/input"
 import Input from "./components/UI/Cool_item/input"
 import OnlineTools from "./components/layout/onlineTools"
+import NotFound from "./components/layout/NotFound";
 import './app.css'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -21,6 +22,7 @@ function App() {
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/onlinetools" element={<OnlineTools />} />
           <Route path="/a" element={<A />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 

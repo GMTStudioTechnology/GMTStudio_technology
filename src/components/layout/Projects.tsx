@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import MazsAI from "../assets/MazsAI.png";
 import ThinkLink from "../assets/ThinkLink.png";
 import Navbar from "./Navigation_bar";
-import Video from "../assets/A.mov";
+import Video from "../assets/A.mov"
 import Video2 from "../assets/B.mov"
 import Vol from "./VelocityScroll"
 import ZenithNet from "../assets/ZenithNet.png"
